@@ -1,0 +1,40 @@
+.creature {
+  position: absolute;
+}
+
+.creature-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+@for $i from 0 through 1 {
+  .creature.nature-#{$i} {
+    margin-top: -33px;
+    margin-left: -22px;
+    background-position: 0px 0px;
+    width: 42px;
+    height: 45px;
+    transition-property: background-position;
+    transition-timing-function: linear;
+  }
+  @for $j from 0 through 1 {
+    .creature.type-#{$i}-#{$j} {
+      background-image: url("images/res/creature/#{$i}/#{$j}.png");
+      @include animation('creatue-#{$i}-#{j} 1.0s infinite');
+    }
+
+    @include keyframes(creatue-#{$i}-#{j}){
+      0%, 9.99%  {background-position: -46px 0px;}
+      10%, 19.99% {background-position: -91px 0px;}
+      20%, 29.99% {background-position: -136px 0px;}
+      30%, 39.99% {background-position: -181px 0px;}
+      40%, 49.99% {background-position: -226px 0px;}
+      50%, 59.99% {background-position: -271px 0px;}
+      60%, 69.99% {background-position: -316px 0px;}
+      70%, 79.99% {background-position: -361px 0px;}
+      80%, 100%   {background-position: -406px 0px;}
+    }
+  }
+}
+
+

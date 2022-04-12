@@ -1,0 +1,76 @@
+.board {
+    padding: 25px;
+    width: 480px;
+    height: 280px ;
+  margin-left: auto;
+  margin-right: auto;
+}
+$tilesMoveDelay : 0.8;
+$tileSz: 25;
+.map {
+    border: solid 1px brown;
+    width: 450px;
+    height: 250px ;
+    position: relative;
+    overflow: hidden;
+}
+.map .char{
+    position: absolute;
+    z-index: 1000;
+}
+.map .hmm0tile {
+    position: absolute;
+    background-size: 100% auto;
+    overflow: visible;
+}
+
+.map .hmm0tile.shift_se{
+  @include shift($tileSz, $tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-west, &.last-north{opacity: 1;}
+  &.last-east, &.last-south{opacity: 0;}
+}
+.map .hmm0tile.shift_sw{
+  @include shift(-$tileSz, $tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-east, &.last-north{opacity: 1;}
+  &.last-west, &.last-south{opacity: 0;}
+}
+.map .hmm0tile.shift_nw{
+  @include shift(-$tileSz, -$tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  opacity: 1;
+  &.last-east, &.last-south{opacity: 1;}
+  &.last-west, &.last-north{opacity: 0;}
+}
+.map .hmm0tile.shift_ne{
+  @include shift($tileSz, -$tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-west, &.last-south{opacity: 1;}
+  &.last-east, &.last-north{opacity: 0;}
+}
+.map .hmm0tile.shift_s{
+  @include shift(0, $tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-north{opacity: 1;}
+  &.last-south{opacity: 0;}
+}
+.map .hmm0tile.shift_w{
+  @include shift(-$tileSz, 0, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-east{opacity: 1;}
+  &.last-west{opacity: 0;}
+}
+.map .hmm0tile.shift_n{
+  @include shift(0, -$tileSz, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  &.last-south{opacity: 1;}
+  &.last-north{opacity: 0;}
+}
+.map .hmm0tile.shift_e{
+  @include shift($tileSz, 0, 0);
+  @include transition(all #{$tilesMoveDelay}s linear);
+  opacity: 1;
+  &.last-west{opacity: 1;}
+  &.last-east{opacity: 0;}
+}

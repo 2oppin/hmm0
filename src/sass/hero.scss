@@ -1,0 +1,109 @@
+.hero-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 94px;
+  height: 63px;
+}
+// --- Hero Sprites -----------
+@for $i from 0 through 18 {
+    $base_height: (-2-(64*$i));
+
+  .char.hero-type-#{$i} {
+    position: absolute;
+    top: -22px;
+    background-image: url("images/res/hero.png");
+    background-position: -480px #{$base_height}px;
+    width: 94px;
+    height: 63px;
+    transition-property: background-position;
+    transition-timing-function: linear;
+  }
+
+  @include keyframes(hero-#{$i}-walk-s){
+      0%, 11.24% {background-position: -481px #{$base_height}px;}
+      11.25%, 22.49% {background-position: -577px #{$base_height}px;}
+      22.50%, 33.74% {background-position: -672px #{$base_height}px;}
+      33.75%, 44.99% {background-position: -769px #{$base_height}px;}
+      45.00%, 56.24% {background-position: -865px #{$base_height}px;}
+      56.25%, 67.49% {background-position: -961px #{$base_height}px;}
+      67.50%, 78.74% {background-position: -1057px #{$base_height}px;}
+      78.75%, 100.00% {background-position: -1153px #{$base_height}px;}
+    }
+    @include keyframes(hero-#{$i}-walk-se){
+      0%, 11.24% {background-position: -1248px #{$base_height}px;}
+      11.25%, 22.49% {background-position: -1344px #{$base_height}px;}
+      22.50%, 33.74% {background-position: -1440px #{$base_height}px;}
+      33.75%, 44.99% {background-position: -1536px #{$base_height}px;}
+      45.00%, 56.24% {background-position: -1632px #{$base_height}px;}
+      56.25%, 67.49% {background-position: -1728px #{$base_height}px;}
+      67.50%, 78.74% {background-position: -1824px #{$base_height}px;}
+      78.75%, 100.00% {background-position: -1920px #{$base_height}px;}
+    }
+    @include keyframes(hero-#{$i}-walk-e){
+      0%, 11.24% {background-position: -2016px #{$base_height}px;}
+      11.25%, 22.49% {background-position: -2112px #{$base_height}px;}
+      22.50%, 33.74% {background-position: -2208px #{$base_height}px;}
+      33.75%, 44.99% {background-position: -2304px #{$base_height}px;}
+      45.00%, 56.24% {background-position: -2400px #{$base_height}px;}
+      56.25%, 67.49% {background-position: -2496px #{$base_height}px;}
+      67.50%, 78.74% {background-position: -2592px #{$base_height}px;}
+      78.75%, 100.00% {background-position: -2688px #{$base_height}px;}
+    }
+    @include keyframes(hero-#{$i}-walk-ne){
+      0%, 11.24% {background-position: -2784px #{$base_height}px;}
+      11.25%, 22.49% {background-position: -2880px #{$base_height}px;}
+      22.50%, 33.74% {background-position: -2976px #{$base_height}px;}
+      33.75%, 44.99% {background-position: -3072px #{$base_height}px;}
+      45.00%, 56.24% {background-position: -3168px #{$base_height}px;}
+      56.25%, 67.49% {background-position: -3264px #{$base_height}px;}
+      67.50%, 78.74% {background-position: -3360px #{$base_height}px;}
+      78.75%, 100.00% {background-position: -3456px #{$base_height}px;}
+    }
+    @include keyframes(hero-#{$i}-walk-n){
+      0%, 11.24% {background-position: -3552px #{$base_height}px;}
+      11.25%, 22.49% {background-position: -3648px #{$base_height}px;}
+      22.50%, 33.74% {background-position: -3744px #{$base_height}px;}
+      33.75%, 44.99% {background-position: -3840px #{$base_height}px;}
+      45.00%, 56.24% {background-position: -3936px #{$base_height}px;}
+      56.25%, 67.49% {background-position: -4032px #{$base_height}px;}
+      67.50%, 78.74% {background-position: -4128px #{$base_height}px;}
+      78.75%, 100.00% {background-position: -4224px #{$base_height}px;}
+    }
+
+    .char.hero-type-#{$i}.walk-n,
+    .up:active ~ .screen .char.hero-type-#{$i}{
+      @include animation('hero-#{$i}-walk-n 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-s,
+    .down:active ~ .screen .char.hero-type-#{$i}{
+      @include animation('hero-#{$i}-walk-s 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-w,
+    .left:active ~ .screen .char.hero-type-#{$i}{
+      @include flipHorizontally();
+      @include animation('hero-#{$i}-walk-e 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-e,
+    .right:active ~ .screen .char.hero-type-#{$i}{
+      @include animation('hero-#{$i}-walk-e 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-ne{
+      @include animation('hero-#{$i}-walk-ne 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-nw{
+      @include flipHorizontally();
+      @include animation('hero-#{$i}-walk-ne 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-se{
+      @include animation('hero-#{$i}-walk-se 0.65s infinite');
+    }
+    .char.hero-type-#{$i}.walk-sw{
+      @include flipHorizontally();
+      @include animation('hero-#{$i}-walk-se 0.65s infinite');
+    }
+}
+
