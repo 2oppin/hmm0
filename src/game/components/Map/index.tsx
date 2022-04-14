@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { DOMAIN_SIZE } from '../../../models/domain';
 import { WorldMap } from '../../../models/worldmap';
 
 type MapProps = {
@@ -10,54 +9,54 @@ type MapProps = {
   y: number;
 }
 type MapState = {
-
+  tilesPreloaded: boolean
 };
 export class Map extends React.Component<MapProps, MapState> {
+  private imageBank: ImageBitmap[] = [];
   constructor(props: MapProps) {
     super(props);
+    this.preloadImages();
+    this.state = {tilesPreloaded: false};
   }
 
-  getTileBg(i: number) {
-    const {world, sz, x, y} = this.props;
-    const [cx, cy] = [x + i%sz - sz/2, y + (i/sz|0) - sz/2];
-//console.log(`getTileBg(${i}) = ${cx}, ${cy}`);
-    const tile = [[0, 1], [0, 0], [1, 0], [1, 1]].reduce((s, [dx, dy]) => 
-      s + (world.isTresspassable(cx + dx, cy + dy) ? 1 : 0) + '_', '');
-    return  `url(images/res/land/dungeon/${tile}1.png)`;
+  preloadImages() {
+    Promise.all(
+      [...Array(1 << 5)].map(async (_, i) => {
+        const img = new Image();
+        const p = new Promise(r =>
+          img.onload = async () =>
+            r(this.imageBank[i] = await createImageBitmap(img, 0, 0, img.width, img.height))
+        );
+        img.src = `images/res/land/dungeon/${i&1}_${(i&2)>>1}_${(i&4)>>2}_${(i&8)>>3}_1.png`;
+        return await p;
+      })
+    ).then(() => this.setState({tilesPreloaded: true}));
   }
 
-  getTileX(i: number) {
-    return `${i - (i / this.props.sz | 0) * this.props.sz * this.props.tileSz}px`;
-  }
+  componentDidUpdate(): void {
+    if (this.state.tilesPreloaded) {
+      const {tileSz, world, sz, x, y} = this.props;
+      const canvas = document.getElementById('bboard-canvas') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d');
 
-  getTileY(i: number) {
-    return `${i - (i / this.props.sz | 0) * this.props.sz * this.props.tileSz}px`;
+      for (let i = 0; i < sz**2; i++) {
+        const [cx, cy] = [x + i%sz - sz/2, y + (i/sz|0) - sz/2];
+        const tile = [[0, 1], [0, 0], [1, 0], [1, 1]].reduce((a, [dx, dy], i) => 
+          a + ((+world.isTresspassable(cx + dx, cy + dy)) << i), 0
+        );
+        ctx.drawImage(this.imageBank[tile], (i%sz) * tileSz, (i/sz|0) * tileSz, tileSz, tileSz);
+      }
+    }
   }
 
   render() {
-    // @TODO - replace with canvas
+    const {sz, tileSz} = this.props;
     return (
-      <div className='bboard' style={{
-        width: this.props.sz * this.props.tileSz + 'px',
-        height: this.props.sz * this.props.tileSz + 'px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        margin: 'auto',
-      }}>
-        {[...Array(this.props.sz**2)].map((_, i) =>
-          <div 
-            key={i}
-            style={{
-              background: this.getTileBg(i),
-              left: this.getTileX(i),
-              top: this.getTileY(i),
-              width: this.props.tileSz + 'px',
-              height: this.props.tileSz + 'px',
-            }}
-            className='tile'>
-          </div>
-        )}
-      </div>
+      <React.Fragment>
+      {this.state.tilesPreloaded &&
+        <canvas id="bboard-canvas" width={tileSz*sz} height={tileSz*sz} ></canvas>
+      }
+      </React.Fragment>
     );
   }
 }
