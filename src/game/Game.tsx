@@ -1,111 +1,118 @@
 import * as React from "react";
 import {Component, KeyboardEvent} from "react";
-import { Monster } from "../models/actors/monster";
 import { Hero as HeroModel, HeroType } from "../models/actors/hero";
-import { WorldMap } from "../models/worldmap";
 import { Creatures } from "./components/Creatures";
-import { Hero, HeroDirection } from "./components/Hero";
+import { Hero } from "./components/Hero";
 
 import {Map} from './components/Map'
 import { WorldMapContext } from "./contexts/WorldMapContext";
-import { DOMAIN_SIZE } from "../models/domain";
+import { Stats } from "./components/stats";
+import { alertDlg, Dialog, textDlg } from "../components/dialog";
+import { KeyboardHandler } from "./contexts/KeyboardContext";
+import { GameProps, GameState, MAP_SZ, TILE_SZ } from "./GameTypes";
+import { loadGameKeyboard } from "./GameKeyboard";
+import { WorldMap } from "../models/worldmap";
+import { Domain } from "../models/domain";
+import { Monster } from "../models/actors/monster";
+import { singnedCoordsToUnsigned } from "../models/utils";
 
-type GameProps = {
-  world: WorldMap;
-}
-type GameState = {
-  x: number;
-  y: number;
-  dx: number;
-  dy: number;
-  heroDirection: HeroDirection;
-  hero: HeroModel;
-  creatures: Monster[];
-}
-const MAP_SZ = 26;
-const TILE_SZ = 25;
-export class Game extends Component<GameProps, GameState> {
+export class Game extends Component<GameProps, Partial<GameState>> {
+  protected kbHandler: KeyboardHandler = null;
   constructor(props: GameProps) {
     super(props);
+
+    this.kbHandler = new KeyboardHandler();
+    // pre-init, to calc localCreatures
+    this.state = {x: 0, y: 0};
     this.state = {
-      x: 0, y: 0,
       dx: 0, dy: 0,
+      x: 0, y: 0,
       heroDirection: 's',
-      hero: new HeroModel(5, Math.random()*18 as HeroType, [0, 0]),
-      creatures: [...Array(10)].map(_ => {
-        let x,y;
-        do [x, y] = [Math.random()*DOMAIN_SIZE|0 - DOMAIN_SIZE/2, Math.random()*DOMAIN_SIZE|0 - DOMAIN_SIZE/2];
-        while(!this.props.world.isTresspassable(x, y));
-        return new Monster(Math.random()*10|0, "nature", [x, y]);
-      }),
+      hero: new HeroModel(5, (Math.random()*18|0) as HeroType, [0, 0], 's'),
+      dialogContents: null,
+      dialogClosable: false,
+      localCreatures: this.getLocalCreatures()
     };
+    loadGameKeyboard(this.kbHandler, () => [this.props, this.state], (upd: Partial<GameState>) => this.setState(upd));
   }
 
-  onKeyDown(e: KeyboardEvent) {
-    let dx =0, dy = 0; 
-    switch (e.key) {
-      case 'ArrowUp':
-        dy = -1;
-        break;
-      case 'ArrowDown':
-        dy = 1;
-        break;
-      case 'ArrowLeft':
-        dx = -1;
-        break;
-      case 'ArrowRight':
-        dx = 1;
-        break;
-    }
-    const heroDirection = ({'0-1': 'n', '-1-1': 'nw', '-10': 'w', '-11': 'sw', '01': 's', '11': 'se', '10': 'e', '1-1': 'ne'} as any)
-      [`${dx || this.state.dx}${dy || this.state.dy}`];
-    dx && this.setState({dx, heroDirection});
-    dy && this.setState({dy, heroDirection});
+  private getLocalCreatures() {
+    const {creatures, world} = this.props;
+    const {x, y} = this.state;
+    const [Dx, Dy] = WorldMap.convertCoord(x, y);
+    const adjDomains: Domain[] = [];
+    for (let dx=-1; dx<=1; dx++)
+    for (let dy=-1; dy<=1; dy++)
+      adjDomains.push(world.getDomain(Dx + dx, Dy + dy));
+    
+    const localCreatures: Monster[] = adjDomains.reduce((a, d) => {
+      const DC = creatures.getForDomain(d);
+      return [...a, ...DC];
+    }, []);
+    return localCreatures;
   }
 
-  onKeyUp(e: KeyboardEvent) {
-    const {dx, dy, x, y, hero, creatures} = this.state;
-    if (dx || dy) {
-      const upd: Partial<GameState> = {dx: 0, dy: 0, x: x + dx, y: y + dy};
-      if (!this.props.world.isTresspassable(upd.x, upd.y)) {
-        upd.x = x;
-        upd.y = y;
-      } else {
-        const enemy = creatures.find(({location: [cx, cy]}) => cx === upd.x && cy === upd.y);
-        if (enemy) {
-          if (!confirm(`СИЛА МОНСТРА = ${enemy.power} СИЛА ГЕРОЯ = ${hero.power}`)) return;
-
+  componentDidUpdate(prevProps: Readonly<GameProps>, prevState: Readonly<Partial<GameState>>, snapshot?: any): void {
+    const {creatures} = this.props;
+    const {enemy, hero, x, y} = this.state;
+    if (enemy) {
+      new Promise((rs, rj) =>
+        this.setState({
+          dialogContents:
+            textDlg(
+              `СИЛА МОНСТРА = ${enemy.power} СИЛА ГЕРОЯ = ${hero.power}`,
+              [['ВПЕРЕД!!!', rs], ['ХМ...НЕ СЕЙЧАС', rj]],
+            ),
+            dialogClosable: false,
+          })
+        )
+        .then(() => {
+          let dialogContents, dialogClosable = false, x = enemy.location[0], y = enemy.location[1];
           if (enemy.power == hero.power) {
-            alert('НИЧЬЯ');
-            delete upd.x;
-            delete upd.y;
+            dialogContents = alertDlg("НИЧЬЯ");
+            dialogClosable = true;
+            x = this.state.x; y = this.state.y;
           } else if (enemy.power > hero.power) {
-            alert('КОНЕЦ ИГРЫ');
-            window.location.href = '';
+            dialogContents = alertDlg("КОНЕЦ ИГРЫ", () => window.location.href = '');
+            dialogClosable = false;
           } else {
-            alert(`ПОБЕДА!!! СИЛА ГЕРОЯ = ${hero.power + 1}`);
+            dialogContents = alertDlg(`ПОБЕДА!!! СИЛА ГЕРОЯ = ${hero.power + 1}`);
             hero.power++;
-            upd.creatures = creatures.filter(({location: [cx, cy]}) => cx !== upd.x || cy !== upd.y);
+            creatures.remove(enemy);
+            dialogClosable = true;
           }
-        }
-      }
-      this.setState(upd as GameState);
+          hero.location = enemy.location;
+          const localCreatures = this.getLocalCreatures();
+          this.setState({x, y, hero, dialogContents,localCreatures});
+        })
+        .catch(() => this.setState({dialogContents: null}));
+      this.setState({enemy: null});
     }
+    const [pDx, pDy] = WorldMap.convertCoord(prevState.x, prevState.y);
+    const [Dx, Dy] = WorldMap.convertCoord(x, y);
+    if (pDx != Dx || pDy != Dy) {
+      this.setState({localCreatures: this.getLocalCreatures()});
+    }
+  }
+
+  componentWillUnmount(): void {
+    this.kbHandler.destroy();
   }
 
   render() {
-    const {x,y, heroDirection, creatures} = this.state;
+    const {world, creatures} = this.props;
+    const {x,y, dialogContents, hero, dialogClosable, localCreatures} = this.state;
+
     return (
-      <WorldMapContext.Provider value={{world: this.props.world}}>
+      <WorldMapContext.Provider value={{world}}>
         <div
-          tabIndex={-1}
-          onKeyDown={(e) => this.onKeyDown(e)}
-          onKeyUp={(e) => this.onKeyUp(e)}
           style={{
             outline: 'none',
             position: 'relative',
+            display: 'flex',
           }}
         >
+          <Stats world={world} creatures={creatures} hero={hero} />
           <div
             style={{
               position: "relative",
@@ -119,8 +126,11 @@ export class Game extends Component<GameProps, GameState> {
             }}
           >
           <Map sz={MAP_SZ} tileSz={TILE_SZ} world={this.props.world} x={x} y={y} />
-          <Hero direction={heroDirection} z={MAP_SZ/2}/>
-          <Creatures x={x} y={y} sz={MAP_SZ} tileSz={TILE_SZ} creatures={creatures}/>
+          <Hero hero={hero} z={MAP_SZ/2}/>
+          <Creatures x={x} y={y} sz={MAP_SZ} tileSz={TILE_SZ} creatures={localCreatures}/>
+          <Dialog show={!!dialogContents} hasCloseButton={dialogClosable} onClose={() => this.setState({dialogContents: null})}>
+            {dialogContents}
+          </Dialog>
           </div>
         </div>
       </WorldMapContext.Provider>

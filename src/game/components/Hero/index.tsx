@@ -1,16 +1,16 @@
 import * as React from "react";
+import { Hero as HeroModel, HeroDirection } from "../../../models/actors/hero";
 
-export type HeroDirection = 'n' | 'e' | 's' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 type HeroProps = {
-  direction: HeroDirection;
   z: number;
+  hero: HeroModel;
 }
 export class Hero extends React.Component<HeroProps> {
   render() {
-    const {z, direction} = this.props;
+    const {z, hero} = this.props;
     return (
       <div className="hero-container">
-        <div className={`char hero-type-1 walk-${direction}`} style={{zIndex: z}}></div>
+        <div className={`char hero-type-${hero.type} walk-${hero.direction}`} style={{zIndex: z}}></div>
       </div>
     );
   }

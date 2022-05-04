@@ -1,0 +1,75 @@
+$btnSecondaryColor: #61dafb;
+$btnPrimaryColor: #282c34;
+$btnBorders: #dededa;
+
+.dialog-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  height: 30%;
+  border-radius: 12px;
+  background: rgb(68, 68, 68);
+  z-index: 100;
+  border: 5px ridge $btnBorders;
+}
+.dialog-container.hidden {
+  display: none;
+}
+.dialog-container .close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 3px ridge $btnBorders;
+  border-radius: 25px;
+  font-size: 25px;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog-container .close-btn div {
+  margin-top: -4px;
+}
+.dialog-container .close-btn:hover {
+  background: $btnSecondaryColor;
+  color: $btnPrimaryColor;
+}
+.dialog-container .dialog {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.dialog-container .dialog .dialog-content {
+  flex: auto;
+  display: flex;
+  align-items: center;
+}
+.dialog-container .dialog .buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+.dialog-container .dialog .buttons button {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid $btnBorders;
+  background: $btnPrimaryColor;
+  color: $btnSecondaryColor;
+  font-size: 20px;
+  cursor: pointer;
+}
+.dialog-container .dialog .buttons button:hover {
+  background: $btnSecondaryColor;
+  color: $btnPrimaryColor;
+}

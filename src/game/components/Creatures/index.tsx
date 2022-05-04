@@ -27,7 +27,6 @@ export class Creatures extends React.Component<CreaturesProps, CreaturesState> {
     const {x, y, sz} = this.props;
     const btw = (p: number) => (a: number) => Math.abs(a - p) < sz / 2;
     const visibleCreatures = creatures.filter(({location: [cx, cy]}) => btw(cx)(x) && btw(cy)(y));
-    console.log(`Filtered: [${x}:${y}] X ${sz/2}`, visibleCreatures);
     return visibleCreatures;
   }
   getPosition(c: Monster) {
