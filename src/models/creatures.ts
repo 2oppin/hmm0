@@ -1,5 +1,6 @@
 import { Monster } from "./actors/monster";
 import { Domain, DOMAIN_SIZE } from "./domain";
+import { singnedCoordsToUnsigned } from "./utils";
 import { WorldMap } from "./worldmap";
 
 export class Creatures {
@@ -11,19 +12,25 @@ export class Creatures {
   ) {
     for(const creature of knownCreatures) {
       const [x, y] = creature.location;
-      const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+      const [Dx, Dy, dx, dy] = this.getStorageCoords([x, y]);
       this.creatures[Dx][Dy][dx][dy] = creature;
     }
   }
 
-  get([x, y]: [number, number]): Monster | null {
+  private getStorageCoords([x, y]: [number, number]): [number, number, number, number] {
     const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [n, m] = singnedCoordsToUnsigned([Dx, Dy]);
+    return [n, m, dx, dy];
+  }
+
+  get([x, y]: [number, number]): Monster | null {
+    const [Dx, Dy, dx, dy] = this.getStorageCoords([x, y]);
     return (this.creatures[Dx] && this.creatures[Dx][Dy]
       && this.creatures[Dx][Dy][dx] && this.creatures[Dx][Dy][dx][dy]) || null;
   }
 
   private set([x, y]: [number, number], m: Monster): void {
-    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [Dx, Dy, dx, dy] = this.getStorageCoords([x, y]);
     this.creatures[Dx] = this.creatures[Dx] || [[[]]];
     this.creatures[Dx][Dy] = this.creatures[Dx][Dy] || [[]];
     this.creatures[Dx][Dy][dx] = this.creatures[Dx][Dy][dx] || [];
@@ -38,14 +45,14 @@ export class Creatures {
   }
 
   remove(creature: Monster) {
-    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(...creature.location);
+    const [Dx, Dy, dx, dy] = this.getStorageCoords(creature.location);
     if (this.creatures[Dx][Dy][dx][dy]) {
         this.creatures[Dx][Dy][dx].splice(dy, 1);
     }
   }
 
   getForDomain(d: Domain): Monster[] {
-    const [Dx, Dy] = d.coords;
+    const [Dx, Dy] = singnedCoordsToUnsigned(d.coords);
     if (!this.creatures[Dx] || !this.creatures[Dx][Dy]) return [];
     return this.creatures[Dx][Dy].reduce((a, c) => [...a, ...c], [])
       .filter(m => !!m); /** @TODO remove nulls */
@@ -60,10 +67,11 @@ export class Creatures {
   }
 
   seed(d: Domain, count = 10, skipCoords: {[key: number]: number} = {}): void {
-    for (let x = -DOMAIN_SIZE/2|0, i=0; x < (DOMAIN_SIZE/2|0) && count; x++)
-    for (let y = -DOMAIN_SIZE/2|0; y < (DOMAIN_SIZE/2|0) && count; y++, i++) {
+    for (let x = 0, i=0; x < DOMAIN_SIZE && count; x++)
+    for (let y = 0; y < DOMAIN_SIZE && count; y++, i++) {
       if (skipCoords[x] === y) continue;
-      if (!d.isTresspassable(x+((DOMAIN_SIZE/2)|0), y + ((DOMAIN_SIZE/2)|0))) continue;
+      if (!d.isTresspassable(x, y)) continue;
+
       let pM = count / (d.dencity * (DOMAIN_SIZE**2 - i));
       if (Math.random() < pM) {
         const real = WorldMap.toGlobalCoord([...d.coords, x, y]);

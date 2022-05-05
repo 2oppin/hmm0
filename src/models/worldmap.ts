@@ -10,9 +10,10 @@ export class WorldMap {
   }
 
   public ensureAdjascent(X: number, Y: number) {
-    for (let dx = 0; dx <= 2; dx++) {
-      for (let dy = 0; dy <= 2; dy++) {
-        this.ensureDomain(X + dx, Y + dy);
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const [Dx, Dy] = singnedCoordsToUnsigned([X + dx, Y + dy]);
+        this.ensureDomain(Dx, Dy);
       }
     }
   }
@@ -24,16 +25,16 @@ export class WorldMap {
     if (this.domains[n][m] === undefined) {
       const [rx, ry] = unsingnedCoordsToSigned([n, m]);
       console.log(`Creating domain ${n}, ${m}  ~ as [${rx}, ${ry}]`);
-      this.domains[n][m] = new Domain(rx+1, ry+1);
+      this.domains[n][m] = new Domain(rx, ry);
     }
   }
 
   public static convertCoord(x: number, y: number): [number, number, number, number] {
-    const [X, Y] = singnedCoordsToUnsigned([x/DOMAIN_SIZE|0, y/DOMAIN_SIZE|0]);
+    const [X, Y] = [Math.floor(x/DOMAIN_SIZE), Math.floor(y/DOMAIN_SIZE)];
     return [
       X, Y,
-      Math.abs(x + DOMAIN_SIZE/2)%DOMAIN_SIZE,
-      Math.abs(y + DOMAIN_SIZE/2)%DOMAIN_SIZE,
+      x - X*DOMAIN_SIZE,
+      y - Y*DOMAIN_SIZE,
     ];
   }
 
@@ -47,11 +48,12 @@ export class WorldMap {
   isTresspassable(x: number, y: number): boolean {
     if ([x, y].find((v) => Math.abs(v) > Number.MAX_SAFE_INTEGER))
       throw new Error(`Universe end's at MAX_INT ${Number.MAX_SAFE_INTEGER} (we'll do something about it later)`);
-    
-    const [n, m, Dx, Dy] = WorldMap.convertCoord(x, y);
+
+    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [n, m] = singnedCoordsToUnsigned([Dx, Dy]);
     this.ensureDomain(n, m);
     
-    return this.domains[n][m].isTresspassable(Dx, Dy);
+    return this.domains[n][m].isTresspassable(dx, dy);
   }
 
   getDomain(x: number, y: number): Domain {

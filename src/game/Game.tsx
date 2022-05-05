@@ -12,9 +12,8 @@ import { KeyboardHandler } from "./contexts/KeyboardContext";
 import { GameProps, GameState, MAP_SZ, TILE_SZ } from "./GameTypes";
 import { loadGameKeyboard } from "./GameKeyboard";
 import { WorldMap } from "../models/worldmap";
-import { Domain } from "../models/domain";
+import { Domain, DOMAIN_SIZE } from "../models/domain";
 import { Monster } from "../models/actors/monster";
-import { singnedCoordsToUnsigned } from "../models/utils";
 
 export class Game extends Component<GameProps, Partial<GameState>> {
   protected kbHandler: KeyboardHandler = null;
@@ -23,12 +22,12 @@ export class Game extends Component<GameProps, Partial<GameState>> {
 
     this.kbHandler = new KeyboardHandler();
     // pre-init, to calc localCreatures
-    this.state = {x: 0, y: 0};
+    this.state = {x: DOMAIN_SIZE/2|0, y: DOMAIN_SIZE/2|0};
     this.state = {
       dx: 0, dy: 0,
-      x: 0, y: 0,
+      x: DOMAIN_SIZE/2|0, y: DOMAIN_SIZE/2|0,
       heroDirection: 's',
-      hero: new HeroModel(5, (Math.random()*18|0) as HeroType, [0, 0], 's'),
+      hero: new HeroModel(5, (Math.random()*18|0) as HeroType, [DOMAIN_SIZE/2|0, DOMAIN_SIZE/2|0], 's'),
       dialogContents: null,
       dialogClosable: false,
       localCreatures: this.getLocalCreatures()

@@ -8,11 +8,12 @@ import {BrowserRouter, Route, Routes} from 'react-router-dom';
 import {StoreContext} from './core/Store';
 import { WorldMap } from './models/worldmap';
 import { Creatures } from './models/creatures';
+import { DOMAIN_SIZE } from './models/domain';
 
 
 const world: WorldMap = new WorldMap();
 const creatures: Creatures = new Creatures();
-creatures.seed(world.getDomain(0, 0), 100, {0:0});
+creatures.seed(world.getDomain(0, 0), 100, {[DOMAIN_SIZE/2|0]: DOMAIN_SIZE/2|0});
 class App extends Component {
   render() {
     return (

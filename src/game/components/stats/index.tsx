@@ -12,11 +12,14 @@ type StatsProps = {
 export class Stats extends React.Component<StatsProps> {
   render() {
     const {world, creatures, hero} = this.props;
+    const [x,y] = hero.location;
+    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
     return (
       <div>
         Hero Power: {hero.power}<br />
         Monsters Left: {creatures.count}<br />
-        Location: <b>{hero.location[0]} : {hero.location[1]}</b><br />
+        Location: <b>{x} : {y}</b><br />
+        D[<b>{Dx} : {Dy}</b>] -&gt; [{dx} : {dy}]<br />
       </div>
     );
   }
