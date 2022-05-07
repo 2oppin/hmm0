@@ -6,6 +6,7 @@ type DialogProps = {
   show: boolean;
   onClose: () => void;
   hasCloseButton?: boolean;
+  children?: React.ReactNode;
 };
 type DialogState = {
 };
