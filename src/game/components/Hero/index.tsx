@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Hero as HeroModel, HeroDirection } from "../../../models/actors/hero";
+import { Hero as HeroModel} from "../../../models/actors/hero";
 
 type HeroProps = {
   z: number;

@@ -1,3 +1,4 @@
+export type Direction = 'n' | 'e' | 's' | 'w' | 'nw' | 'ne' | 'sw' | 'se';
 export class TerrainMap {
   // @TODO store as a sting
   private map: (0|1)[][];

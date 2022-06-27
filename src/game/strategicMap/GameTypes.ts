@@ -1,7 +1,8 @@
-import { Hero, HeroDirection } from "../models/actors/hero";
-import { Monster } from "../models/actors/monster";
-import { Creatures } from "../models/creatures";
-import { WorldMap } from "../models/worldmap";
+import { Hero } from "../../models/actors/hero";
+import { Direction } from "../../models/terrainmap";
+import { Monster } from "../../models/actors/monster";
+import { Creatures } from "../../models/creatures";
+import { WorldMap } from "../../models/worldmap";
 
 export const MAP_SZ = 12*2;
 export const TILE_SZ = 25;
@@ -15,7 +16,7 @@ export type GameState = {
   y: number;
   dx: number;
   dy: number;
-  heroDirection: HeroDirection;
+  heroDirection: Direction;
   hero: Hero;
 
   // event State

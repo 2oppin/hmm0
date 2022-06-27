@@ -1,19 +1,20 @@
 import * as React from "react";
 import {Component, KeyboardEvent} from "react";
-import { Hero as HeroModel, HeroType } from "../models/actors/hero";
-import { Creatures } from "./components/Creatures";
-import { Hero } from "./components/Hero";
+import { Hero as HeroModel, HeroType } from "../../models/actors/hero";
+import { Creatures } from "../components/Creatures";
+import { Hero } from "../components/Hero";
 
-import {Map} from './components/Map'
-import { WorldMapContext } from "./contexts/WorldMapContext";
-import { Stats } from "./components/stats";
-import { alertDlg, Dialog, textDlg } from "../components/dialog";
-import { KeyboardHandler } from "./contexts/KeyboardContext";
+import {TerrainMap} from '../components/Map'
+import { WorldMapContext } from "../contexts/WorldMapContext";
+import { Stats } from "../components/stats";
+import { alertDlg, Dialog, textDlg } from "../../components/dialog";
+import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { GameProps, GameState, MAP_SZ, TILE_SZ } from "./GameTypes";
 import { loadGameKeyboard } from "./GameKeyboard";
-import { WorldMap } from "../models/worldmap";
-import { Domain, DOMAIN_SIZE } from "../models/domain";
-import { Monster } from "../models/actors/monster";
+import { WorldMap } from "../../models/worldmap";
+import { Domain, DOMAIN_SIZE } from "../../models/domain";
+import { Monster } from "../../models/actors/monster";
+import { Board } from "../components/Board";
 
 export class Game extends Component<GameProps, Partial<GameState>> {
   protected kbHandler: KeyboardHandler = null;
@@ -104,13 +105,7 @@ export class Game extends Component<GameProps, Partial<GameState>> {
 
     return (
       <WorldMapContext.Provider value={{world}}>
-        <div
-          style={{
-            outline: 'none',
-            position: 'relative',
-            display: 'flex',
-          }}
-        >
+        <Board>
           <Stats world={world} creatures={creatures} hero={hero} />
           <div
             style={{
@@ -124,14 +119,14 @@ export class Game extends Component<GameProps, Partial<GameState>> {
               margin: 'auto',
             }}
           >
-          <Map sz={MAP_SZ} tileSz={TILE_SZ} world={this.props.world} x={x} y={y} />
+          <TerrainMap sz={MAP_SZ} tileSz={TILE_SZ} world={this.props.world} x={x} y={y} />
           <Hero hero={hero} z={MAP_SZ/2}/>
           <Creatures x={x} y={y} sz={MAP_SZ} tileSz={TILE_SZ} creatures={localCreatures}/>
           <Dialog show={!!dialogContents} hasCloseButton={dialogClosable} onClose={() => this.setState({dialogContents: null})}>
             {dialogContents}
           </Dialog>
           </div>
-        </div>
+        </Board>
       </WorldMapContext.Provider>
     );
   }

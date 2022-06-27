@@ -1,5 +1,5 @@
-import { HeroDirection } from "../models/actors/hero";
-import { KeyboardHandler } from "./contexts/KeyboardContext";
+import { Direction } from "../../models/terrainmap";
+import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { GameProps, GameState } from "./GameTypes";
 
 const readyToNorth = (props: GameProps, state: Partial<GameState>) => (e: KeyboardEvent): Partial<GameState> =>
@@ -47,7 +47,7 @@ const mapDirToCoords: {[dir: string]: [-1|0|1, -1|0|1]} = {
   'se': [1, 1],
 };
 
-const justGo = (props: GameProps, state: Partial<GameState>) => (dir: HeroDirection) => {
+const justGo = (props: GameProps, state: Partial<GameState>) => (dir: Direction) => {
   let x = state.x, y = state.y;
   let [dx, dy] = mapDirToCoords[dir];
   if (!props.world.isTresspassable(x + dx, y + dy))
@@ -58,7 +58,6 @@ const justGo = (props: GameProps, state: Partial<GameState>) => (dir: HeroDirect
     state.hero.location = [x + dx, y + dy];
     return {dx: 0, dy: 0, x: x + dx, y: y + dy};
   }
-
   return {dx: 0, dy: 0, enemy};
 }
 

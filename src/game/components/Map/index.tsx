@@ -11,7 +11,7 @@ type MapProps = {
 type MapState = {
   tilesPreloaded: boolean
 };
-export class Map extends React.Component<MapProps, MapState> {
+export class TerrainMap extends React.Component<MapProps, MapState> {
   private imageBank: ImageBitmap[] = [];
   constructor(props: MapProps) {
     super(props);

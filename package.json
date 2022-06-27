@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@sentry/browser": "^6.19.7",
+    "@sentry/tracing": "^6.19.7",
     "axios": "^0.27.2",
     "dotenv": "^16.0.0",
+    "hmm0-srv": "github:2oppin/hmm0-srv",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0"
