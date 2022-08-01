@@ -2,7 +2,7 @@ import * as React from "react";
 
 export class Board extends React.Component<{children: React.ReactElement[]}> {
   render(): any {
-    return
+    return (
       <div style={{
           outline: 'none',
           position: 'relative',
@@ -11,5 +11,6 @@ export class Board extends React.Component<{children: React.ReactElement[]}> {
       >
         {this.props.children}
       </div>
+    );
   }
 }

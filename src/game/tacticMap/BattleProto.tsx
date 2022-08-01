@@ -4,30 +4,29 @@ import { Hero as HeroModel, HeroType } from "../../models/actors/hero";
 import { Creatures } from "../components/Creatures";
 import { Hero } from "../components/Hero";
 
-import {Map} from '../components/Map'
+import { TerrainMap } from '../components/Map'
 import { WorldMapContext } from "../contexts/WorldMapContext";
 import { Stats } from "../components/stats";
 import { alertDlg, Dialog, textDlg } from "../../components/dialog";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { BattleProps, BattleState, MAP_SZ, TILE_SZ } from "./BattleTypes";
 import { loadBattleKeyboard } from "./BattleKeyboard";
-import { WorldMap } from "../../models/worldmap";
-import { Domain, DOMAIN_SIZE } from "../../models/domain";
+import { Domain } from "../../models/domain";
 import { Monster } from "../../models/actors/monster";
 
 export class BattleProto extends Component<BattleProps, Partial<BattleState>> {
   protected kbHandler: KeyboardHandler = null;
   constructor(props: BattleProps) {
     super(props);
-
+    const { domainSize } = props.world;
     this.kbHandler = new KeyboardHandler();
     // pre-init, to calc localCreatures
-    this.state = {x: DOMAIN_SIZE/2|0, y: DOMAIN_SIZE/2|0};
+    this.state = {x: domainSize/2|0, y: domainSize/2|0};
     this.state = {
       dx: 0, dy: 0,
-      x: DOMAIN_SIZE/2|0, y: DOMAIN_SIZE/2|0,
+      x: domainSize/2|0, y: domainSize/2|0,
       heroDirection: 's',
-      hero: new HeroModel(5, (Math.random()*18|0) as HeroType, [DOMAIN_SIZE/2|0, DOMAIN_SIZE/2|0], 's'),
+      hero: new HeroModel(5, (Math.random()*18|0) as HeroType, [domainSize/2|0, domainSize/2|0], 's'),
       dialogContents: null,
       dialogClosable: false,
       localCreatures: this.getLocalCreatures()
@@ -38,7 +37,7 @@ export class BattleProto extends Component<BattleProps, Partial<BattleState>> {
   private getLocalCreatures() {
     const {creatures, world} = this.props;
     const {x, y} = this.state;
-    const [Dx, Dy] = WorldMap.convertCoord(x, y);
+    const [Dx, Dy] = world.convertCoord(x, y);
     const adjDomains: Domain[] = [];
     for (let dx=-1; dx<=1; dx++)
     for (let dy=-1; dy<=1; dy++)
@@ -52,7 +51,7 @@ export class BattleProto extends Component<BattleProps, Partial<BattleState>> {
   }
 
   componentDidUpdate(prevProps: Readonly<BattleProps>, prevState: Readonly<Partial<BattleState>>, snapshot?: any): void {
-    const {creatures} = this.props;
+    const {creatures, world} = this.props;
     const {enemy, hero, x, y} = this.state;
     if (enemy) {
       new Promise((rs, rj) =>
@@ -87,8 +86,8 @@ export class BattleProto extends Component<BattleProps, Partial<BattleState>> {
         .catch(() => this.setState({dialogContents: null}));
       this.setState({enemy: null});
     }
-    const [pDx, pDy] = WorldMap.convertCoord(prevState.x, prevState.y);
-    const [Dx, Dy] = WorldMap.convertCoord(x, y);
+    const [pDx, pDy] = world.convertCoord(prevState.x, prevState.y);
+    const [Dx, Dy] = world.convertCoord(x, y);
     if (pDx != Dx || pDy != Dy) {
       this.setState({localCreatures: this.getLocalCreatures()});
     }
@@ -124,7 +123,7 @@ export class BattleProto extends Component<BattleProps, Partial<BattleState>> {
               margin: 'auto',
             }}
           >
-          <Map sz={MAP_SZ} tileSz={TILE_SZ} world={this.props.world} x={x} y={y} />
+          <TerrainMap sz={MAP_SZ} tileSz={TILE_SZ} world={this.props.world} x={x} y={y} />
           <Hero hero={hero} z={MAP_SZ/2}/>
           <Creatures x={x} y={y} sz={MAP_SZ} tileSz={TILE_SZ} creatures={localCreatures}/>
           <Dialog show={!!dialogContents} hasCloseButton={dialogClosable} onClose={() => this.setState({dialogContents: null})}>

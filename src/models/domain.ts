@@ -1,7 +1,4 @@
-import { TerrainMap } from "./terrainmap";
-
-// @IMPORTANT: should be even number
-export const DOMAIN_SIZE = 32*2;
+import { TerrainMap } from "hmm0-types/terrainmap";
 
 /**
  *  Domain coords do not have [0,0] in the center,
@@ -11,14 +8,8 @@ export class Domain {
   constructor (
     protected Dx: number,
     protected Dy: number,
-    protected startingPoint: boolean = false,
-    protected map: TerrainMap = null,
-  ) {
-    console.log(`Domain created: ${this.Dx}, ${this.Dy}`);
-    if (!map) {
-      this.map = new TerrainMap(DOMAIN_SIZE, 0.6, startingPoint ? 5 : 0);
-    }
-  }
+    protected map: TerrainMap,
+  ) {}
 
   get x() {
     return this.Dx;

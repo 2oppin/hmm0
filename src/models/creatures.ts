@@ -1,5 +1,5 @@
 import { Monster } from "./actors/monster";
-import { Domain, DOMAIN_SIZE } from "./domain";
+import { Domain } from "./domain";
 import { singnedCoordsToUnsigned } from "./utils";
 import { WorldMap } from "./worldmap";
 
@@ -8,6 +8,7 @@ export class Creatures {
   [[[Monster[]]]] = [[[[]]]];
 
   constructor(
+    private world: WorldMap,
     knownCreatures: Monster[] = [],
   ) {
     for(const creature of knownCreatures) {
@@ -18,7 +19,7 @@ export class Creatures {
   }
 
   private getStorageCoords([x, y]: [number, number]): [number, number, number, number] {
-    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [Dx, Dy, dx, dy] = this.world.convertCoord(x, y);
     const [n, m] = singnedCoordsToUnsigned([Dx, Dy]);
     return [n, m, dx, dy];
   }
@@ -67,14 +68,14 @@ export class Creatures {
   }
 
   seed(d: Domain, count = 10, skipCoords: {[key: number]: number} = {}): void {
-    for (let x = 0, i=0; x < DOMAIN_SIZE && count; x++)
-    for (let y = 0; y < DOMAIN_SIZE && count; y++, i++) {
+    for (let x = 0, i=0; x < this.world.domainSize && count; x++)
+    for (let y = 0; y < this.world.domainSize && count; y++, i++) {
       if (skipCoords[x] === y) continue;
       if (!d.isTresspassable(x, y)) continue;
 
-      let pM = count / (d.dencity * (DOMAIN_SIZE**2 - i));
+      let pM = count / (d.dencity * (this.world.domainSize**2 - i));
       if (Math.random() < pM) {
-        const real = WorldMap.toGlobalCoord([...d.coords, x, y]);
+        const real = this.world.toGlobalCoord([...d.coords, x, y]);
         count--;
         this.add(new Monster(Math.random()*10|0, "nature", real));
       }

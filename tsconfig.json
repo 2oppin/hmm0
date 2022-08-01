@@ -7,7 +7,14 @@
     "target": "es5",
     "jsx": "react",
     "allowJs": true,
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "baseUrl": "./src",
+    "paths": {
+      "hmm0-types/*": [
+        "../hmm0-srv/src/models/*"
+      ],
+    },
+  },
+  "exclude": ["dist", "hmm0-srv"],
 }
 

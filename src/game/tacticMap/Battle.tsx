@@ -1,46 +1,59 @@
 import * as React from "react";
+import { useParams } from "react-router-dom";
 import { ApiContext } from "../../core/providers/mockApi";
 import { Hero } from "../../models/actors/hero";
 import { Monster } from "../../models/actors/monster";
+import { Domain } from "../../models/domain";
 import { Player } from "../../models/player";
 import { WorldMap } from "../../models/worldmap";
-import { TerrainMap } from "../components/Map";
+import { TerrainMap } from "hmm0-types/terrainmap";
+
+import { Board } from "../components/Board";
+import { Stats } from "./components/stats";
+import { useContext, useEffect, useState } from "react";
+import { BattleMap } from "./BattleMap";
+import { StoreContext } from "../../core/Store";
 
 type BattlePlayers = {
   player: Player;
   hero: Hero;
   army: Monster[];
 }
-type BattleProps = {
-  world: WorldMap;
-  attacker: string;
-  defender: string;
-}
-type BattleState = {
-  players: BattlePlayers[];
-  ready: boolean;
-}
-export class Battle extends React.Component<BattleProps, BattleState> {
-  constructor(props: BattleProps) {
-    super(props);
-    this.state = {
-      players: [],
-      ready: false,
-    };
-  }
 
-  async componentDidMount() {
-    this.setState({players: await this.loadPlayers()});
-  }
+export const Battle = () => {
+  const {store: {world}} = useContext(StoreContext);
+  const {attaker, defender} = useParams();
+  const api = useContext(ApiContext);
+  const [players, setPlayers] = useState<BattlePlayers[]>([]);
+  const [ready, setReady] = useState<boolean>(false);
+  const [battlefield, setBattlefield] = useState<WorldMap>();
 
-  async loadPlayers(): Promise<BattlePlayers[]> {
+  const loadPlayers = async (): Promise<BattlePlayers[]> => {
     return [];
   }
 
-  render() {
-    return <ApiContext.Consumer>{api => <>
-      <TerrainMap sz={0} tileSz={0} world={new WorldMap} x={0} y={0} />
-    </>}
-    </ApiContext.Consumer>
+  const createTerrain = async (): Promise<WorldMap> => {
+    const terrain = await api.getTerrainAt(0,0,0,0);
+    return new WorldMap([
+      [new Domain(0, 0, TerrainMap.fromString(terrain))]
+    ]);
   }
+
+  useEffect(() => {
+    Promise.all([
+      loadPlayers(),
+      createTerrain(),
+    ]). then(([players, battlefield]) => {
+      setPlayers(players);
+      setBattlefield(battlefield);
+      setReady(true);
+    });
+  })
+
+  return (
+    <Board>
+      <Stats />
+      {ready && <BattleMap world={world} />}
+    </Board>
+  );
 }

@@ -13,7 +13,7 @@ export class Stats extends React.Component<StatsProps> {
   render() {
     const {world, creatures, hero} = this.props;
     const [x,y] = hero.location;
-    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [Dx, Dy, dx, dy] = world.convertCoord(x, y);
     return (
       <div>
         Hero Power: {hero.power}<br />

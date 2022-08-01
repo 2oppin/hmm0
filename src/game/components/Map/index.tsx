@@ -12,22 +12,25 @@ type MapState = {
   tilesPreloaded: boolean
 };
 export class TerrainMap extends React.Component<MapProps, MapState> {
-  private imageBank: ImageBitmap[] = [];
+  private static imageBank: ImageBitmap[] = [];
+  private static preloaded = false;
   constructor(props: MapProps) {
     super(props);
     this.preloadImages();
-    this.state = {tilesPreloaded: false};
+    this.state = {tilesPreloaded: TerrainMap.preloaded};
   }
 
   preloadImages() {
     Promise.all(
-      [...Array(1 << 5)].map(async (_, i) => {
+      TerrainMap.preloaded
+        ? []
+        : [...Array(1 << 5)].map(async (_, i) => {
         const img = new Image();
         const p = new Promise(r =>
           img.onload = async () =>
-            r(this.imageBank[i] = await createImageBitmap(img, 0, 0, img.width, img.height))
+            r(TerrainMap.imageBank[i] = await createImageBitmap(img, 0, 0, img.width, img.height))
         );
-        img.src = `images/res/land/dungeon/${i&1}_${(i&2)>>1}_${(i&4)>>2}_${(i&8)>>3}_1.png`;
+        img.src = `/images/res/land/dungeon/${i&1}_${(i&2)>>1}_${(i&4)>>2}_${(i&8)>>3}_1.png`;
         return await p;
       })
     ).then(() => this.setState({tilesPreloaded: true}));
@@ -44,13 +47,14 @@ export class TerrainMap extends React.Component<MapProps, MapState> {
         const tile = [[0, 1], [0, 0], [1, 0], [1, 1]].reduce((a, [dx, dy], i) => 
           a + ((+world.isTresspassable(cx + dx, cy + dy)) << i), 0
         );
-        ctx.drawImage(this.imageBank[tile], (i%sz) * tileSz, (i/sz|0) * tileSz, tileSz, tileSz);
+        ctx.drawImage(TerrainMap.imageBank[tile], (i%sz) * tileSz, (i/sz|0) * tileSz, tileSz, tileSz);
       }
     }
   }
 
   render() {
     const {sz, tileSz} = this.props;
+
     return (
       <React.Fragment>
       {this.state.tilesPreloaded &&

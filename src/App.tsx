@@ -3,30 +3,26 @@ import {Component} from 'react';
 import './App.scss';
 
 import {Game} from './game/strategicMap/Game';
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import {BrowserRouter, Route, Routes, useParams} from 'react-router-dom';
 
 import {StoreContext} from './core/Store';
 import { WorldMap } from './models/worldmap';
 import { Creatures } from './models/creatures';
-import { DOMAIN_SIZE } from './models/domain';
 import { Battle } from './game/tacticMap/Battle';
 import { ApiContext, MockApi } from './core/providers/mockApi';
 
 
 const world: WorldMap = new WorldMap();
-const creatures: Creatures = new Creatures();
-creatures.seed(world.getDomain(0, 0), 100, {[DOMAIN_SIZE/2|0]: DOMAIN_SIZE/2|0});
+const creatures: Creatures = new Creatures(world);
+creatures.seed(world.getDomain(0, 0), 100, {[world.domainSize/2|0]: world.domainSize/2|0});
 class App extends Component {
   render() {
     return (
         <div className="App">
           <BrowserRouter>
             <Routes>
+              <Route path="battle/:attaker/:defender" element={<Battle />} />
               <Route path="/" element={<Game world={world} creatures={creatures} />}/>
-              <Route path="/battle/:attacker/:defender"><>{({match: {params: {filter: {attaker, defender}}}}: any) =>
-                <Battle world={world} attacker={attaker} defender={defender}/>
-              }</>
-              </Route>
             </Routes>
           </BrowserRouter>
         </div>

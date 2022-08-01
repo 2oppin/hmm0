@@ -1,12 +1,19 @@
-import { Domain, DOMAIN_SIZE } from "./domain";
+import { Domain } from "./domain";
+import { TerrainMap } from "hmm0-types/terrainmap";
 import { singnedCoordsToUnsigned, unsingnedCoordsToSigned } from "./utils";
 
 export class WorldMap {
-  private domains: Domain[][] = [];
-
-  constructor() {
-    this.domains[0] = [new Domain(0, 0, true)];
+  constructor(
+    private domains: Domain[][] = [],
+    private DOMAIN_SIZE = 32*2,
+  ) {
+    this.domains = domains.length
+      ? domains
+      : [[new Domain(0, 0, new TerrainMap(DOMAIN_SIZE, 0.6, 5))]];
     this.ensureAdjascent(0, 0);
+  }
+  get domainSize() {
+    return this.DOMAIN_SIZE;
   }
 
   public ensureAdjascent(X: number, Y: number) {
@@ -24,24 +31,24 @@ export class WorldMap {
     }
     if (this.domains[n][m] === undefined) {
       const [rx, ry] = unsingnedCoordsToSigned([n, m]);
-      console.log(`Creating domain ${n}, ${m}  ~ as [${rx}, ${ry}]`);
-      this.domains[n][m] = new Domain(rx, ry);
+      // console.log(`Creating domain ${n}, ${m}  ~ as [${rx}, ${ry}]`);
+      this.domains[n][m] = new Domain(rx, ry, new TerrainMap(this.DOMAIN_SIZE, 0.6, 0));
     }
   }
 
-  public static convertCoord(x: number, y: number): [number, number, number, number] {
-    const [X, Y] = [Math.floor(x/DOMAIN_SIZE), Math.floor(y/DOMAIN_SIZE)];
+  public convertCoord(x: number, y: number): [number, number, number, number] {
+    const [X, Y] = [Math.floor(x/this.DOMAIN_SIZE), Math.floor(y/this.DOMAIN_SIZE)];
     return [
       X, Y,
-      x - X*DOMAIN_SIZE,
-      y - Y*DOMAIN_SIZE,
+      x - X*this.DOMAIN_SIZE,
+      y - Y*this.DOMAIN_SIZE,
     ];
   }
 
-  public static toGlobalCoord(coords: [number,number, number, number]): [number, number] {
+  public toGlobalCoord(coords: [number,number, number, number]): [number, number] {
     return [
-      coords[0] * DOMAIN_SIZE + coords[2],
-      coords[1] * DOMAIN_SIZE + coords[3],
+      coords[0] * this.DOMAIN_SIZE + coords[2],
+      coords[1] * this.DOMAIN_SIZE + coords[3],
     ];
   }
 
@@ -49,7 +56,7 @@ export class WorldMap {
     if ([x, y].find((v) => Math.abs(v) > Number.MAX_SAFE_INTEGER))
       throw new Error(`Universe end's at MAX_INT ${Number.MAX_SAFE_INTEGER} (we'll do something about it later)`);
 
-    const [Dx, Dy, dx, dy] = WorldMap.convertCoord(x, y);
+    const [Dx, Dy, dx, dy] = this.convertCoord(x, y);
     const [n, m] = singnedCoordsToUnsigned([Dx, Dy]);
     this.ensureDomain(n, m);
     

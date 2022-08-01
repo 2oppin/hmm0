@@ -44,11 +44,15 @@ module.exports = {
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+    alias: {
+      "hmm0-types": path.resolve(__dirname, "./hmm0-srv/src/models"),
+    },
   },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
+    publicPath: '/',
   },
   devServer: process.env.DEBUG ? {
     static: {
@@ -64,6 +68,13 @@ module.exports = {
 
     port: 9005,
 
+    historyApiFallback: {
+      index: '/',
+      rewrites: [
+        { from: /^\/$/, to: '/' },
+        { from: /./, to: '/' },
+      ],
+    }
   } : undefined,
   watchOptions: {
     aggregateTimeout: 200,
