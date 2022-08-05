@@ -18,14 +18,14 @@ creatures.seed(world.getDomain(0, 0), 100, {[world.domainSize/2|0]: world.domain
 class App extends Component {
   render() {
     return (
+      <BrowserRouter>
         <div className="App">
-          <BrowserRouter>
             <Routes>
-              <Route path="battle/:attaker/:defender" element={<Battle />} />
               <Route path="/" element={<Game world={world} creatures={creatures} />}/>
+              <Route path="/battle/:attaker/:defender" element={<Battle />} />
             </Routes>
-          </BrowserRouter>
         </div>
+      </BrowserRouter>
     );
   }
 }

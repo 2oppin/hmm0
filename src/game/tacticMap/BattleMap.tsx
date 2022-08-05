@@ -17,7 +17,7 @@ export class BattleMap extends React.Component<BattleProps, BattleState> {
     const {world, bottomArmy} = this.props;
     return <>
       <TerrainMap
-        sz={20} tileSz={25} x={0} y={0}
+        sz={20} tileSz={25} x={10} y={10}
         world={world}
       />
       <Unit unit={bottomArmy.units[0]} z={100} color={false ? '#0f0' : '#f00'} />

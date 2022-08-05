@@ -9,7 +9,7 @@ export class WorldMap {
   ) {
     this.domains = domains.length
       ? domains
-      : [[new Domain(0, 0, new TerrainMap(DOMAIN_SIZE, 0.6, 5))]];
+      : [[new Domain(0, 0, new TerrainMap(DOMAIN_SIZE, 0.6, 'starting-point'))]];
     this.ensureAdjascent(0, 0);
   }
   get domainSize() {
@@ -32,7 +32,7 @@ export class WorldMap {
     if (this.domains[n][m] === undefined) {
       const [rx, ry] = unsingnedCoordsToSigned([n, m]);
       // console.log(`Creating domain ${n}, ${m}  ~ as [${rx}, ${ry}]`);
-      this.domains[n][m] = new Domain(rx, ry, new TerrainMap(this.DOMAIN_SIZE, 0.6, 0));
+      this.domains[n][m] = new Domain(rx, ry, new TerrainMap(this.DOMAIN_SIZE, 0.6));
     }
   }
 
@@ -59,7 +59,6 @@ export class WorldMap {
     const [Dx, Dy, dx, dy] = this.convertCoord(x, y);
     const [n, m] = singnedCoordsToUnsigned([Dx, Dy]);
     this.ensureDomain(n, m);
-    
     return this.domains[n][m].isTresspassable(dx, dy);
   }
 

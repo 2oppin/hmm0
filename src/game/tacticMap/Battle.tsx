@@ -22,7 +22,6 @@ type BattlePlayers = {
 }
 
 export const Battle = () => {
-  const {store: {world}} = useContext(StoreContext);
   const {attaker, defender} = useParams();
   const api = useContext(ApiContext);
   const [players, setPlayers] = useState<BattlePlayers[]>([]);
@@ -40,30 +39,26 @@ export const Battle = () => {
   }
   const createTerrain = async (): Promise<WorldMap> => {
     const terrain = await api.getTerrainAt(0,0,0,0);
-    return new WorldMap([
-      [new Domain(0, 0, TerrainMap.fromString(terrain))]
-    ]);
+    return new WorldMap([[new Domain(0, 0, terrain)]], 22);
   }
-
   useEffect(() => {
-    Promise.all([
-      loadPlayers(),
-      createTerrain(),
-      loadArmy(attaker),
-      loadArmy(defender),
-    ]). then(([players, battlefield, attakingArmy, defendingArmy]) => {
-      setPlayers(players);
-      setBattlefield(battlefield);
-      setReady(true);
-      setAttackers(attakingArmy);
-      setDefenders(defendingArmy);
-    });
-  })
+  Promise.all([
+    loadPlayers(),
+    createTerrain(),
+    loadArmy(attaker),
+    loadArmy(defender),
+  ]). then(([players, battlefield, attakingArmy, defendingArmy]) => {
+    setPlayers(players);
+    setBattlefield(battlefield);
+    setAttackers(attakingArmy);
+    setDefenders(defendingArmy);
+  }).then(() => setReady(true));
+}, []);
 
   return (
     <Board>
       <Stats />
-      {ready && <BattleMap world={world} topArmy={attackers} bottomArmy={defenders} />}
+      {ready && <BattleMap world={battlefield} topArmy={attackers} bottomArmy={defenders} />}
       {!ready && <div>Loading...</div>}
     </Board>
   );
