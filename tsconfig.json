@@ -8,13 +8,17 @@
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "paths": {
       "hmm0-types/*": [
-        "../hmm0-srv/src/models/*"
+        "./hmm0-srv/src/models/*"
+      ],
+      "*": [
+        "./src/*"
       ],
     },
   },
   "exclude": ["dist", "hmm0-srv"],
+  "include": ["hmm0-srv/src/models/*", "./src/*"]
 }
 

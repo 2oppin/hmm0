@@ -13,6 +13,7 @@ import { Stats } from "./components/stats";
 import { useContext, useEffect, useState } from "react";
 import { BattleMap } from "./BattleMap";
 import { StoreContext } from "../../core/Store";
+import { Army } from "hmm0-types/monster/army";
 
 type BattlePlayers = {
   player: Player;
@@ -28,10 +29,15 @@ export const Battle = () => {
   const [ready, setReady] = useState<boolean>(false);
   const [battlefield, setBattlefield] = useState<WorldMap>();
 
+  const [attackers, setAttackers] = useState<Army>();
+  const [defenders, setDefenders] = useState<Army>();
+
   const loadPlayers = async (): Promise<BattlePlayers[]> => {
     return [];
   }
-
+  const loadArmy = async (id: string): Promise<Army> => {
+    return await api.getArmy(id);
+  }
   const createTerrain = async (): Promise<WorldMap> => {
     const terrain = await api.getTerrainAt(0,0,0,0);
     return new WorldMap([
@@ -43,17 +49,22 @@ export const Battle = () => {
     Promise.all([
       loadPlayers(),
       createTerrain(),
-    ]). then(([players, battlefield]) => {
+      loadArmy(attaker),
+      loadArmy(defender),
+    ]). then(([players, battlefield, attakingArmy, defendingArmy]) => {
       setPlayers(players);
       setBattlefield(battlefield);
       setReady(true);
+      setAttackers(attakingArmy);
+      setDefenders(defendingArmy);
     });
   })
 
   return (
     <Board>
       <Stats />
-      {ready && <BattleMap world={world} />}
+      {ready && <BattleMap world={world} topArmy={attackers} bottomArmy={defenders} />}
+      {!ready && <div>Loading...</div>}
     </Board>
   );
 }

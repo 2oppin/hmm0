@@ -3,12 +3,35 @@ import {TerrainMap} from 'hmm0-types/terrainmap';
 import {Army} from 'hmm0-types/monster/army';
 
 export class MockApi {
-  async getArmy(id: string): Promise<Army[]> {
-    return [];
-  }
-
   async getTerrainAt(Dx: number, Dy: number, x: number, y: number): Promise<string> {
     return new TerrainMap(32, 0.9, 0).toString();
+  }
+
+  async getArmy(id: string): Promise<Army> {
+    return {
+      heroId: id,
+      location: [0, 0],
+      units: [
+        {
+          count: 1,
+          health: 0.72,
+          direction: "nw",
+          monster: { type: 'ogre', power: 1, hp: 100, location: [0, 0]}
+        },
+        {
+          count: 1,
+          health: 0.72,
+          direction: "nw",
+          monster: { type: 'ogre', power: 1, hp: 100, location: [0, 0]}
+        },
+        {
+          count: 1,
+          health: 0.72,
+          direction: "nw",
+          monster: { type: 'ogre', power: 1, hp: 100, location: [0, 0]}
+        },
+      ]
+    };
   }
 }
 

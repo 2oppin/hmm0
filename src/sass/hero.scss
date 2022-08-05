@@ -15,7 +15,7 @@
   .char.hero-type-#{$i} {
     position: absolute;
     top: -22px;
-    background-image: url("images/res/hero.png");
+    background-image: url("/images/res/hero.png");
     background-position: -480px #{$base_height}px;
     width: 94px;
     height: 63px;

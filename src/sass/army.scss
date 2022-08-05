@@ -1,0 +1,114 @@
+.army-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 94px;
+  height: 63px;
+}
+.army-health {
+  width: 33px;
+  height: 15px;
+  border-radius: 15px;
+  top: 16px;
+  left: 15px;
+  position: absolute;
+}
+$armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, cyclops, centaur, minotaur, dragon, giant;
+// --- Hero Sprites -----------
+@each $type in $armyTypes {
+  .char.army-type-#{$type} {
+    position: absolute;
+    top: -22px;
+    background-image: url("/images/res/#{$type}_army.png");
+    // background-position: -480px 0px;
+    background-size: 512px 512px;
+    width: 64px;
+    height: 64px;
+    transition-property: background-position;
+    transition-timing-function: linear;
+  }
+
+  @include keyframes(army-#{$type}-walk-sw){
+    0%, 24.99% {background-position: 0px -448px;}
+    25%, 49.99% {background-position: -64px -448px;}
+    50%, 74.99% {background-position: -128px -448px;}
+    75%, 100% {background-position: -192px -448px;}
+  }
+  @include keyframes(army-#{$type}-walk-s){
+    0%, 24.99% {background-position: 0px -384px;}
+    25%, 49.99% {background-position: -64px -384px;}
+    50%, 74.99% {background-position: -128px -384px;}
+    75%, 100% {background-position: -192px -384px;}
+  }
+  @include keyframes(army-#{$type}-walk-se){
+    0%, 24.99% {background-position: 0px -320px;}
+    25%, 49.99% {background-position: -64px -320px;}
+    50%, 74.99% {background-position: -128px -320px;}
+    75%, 100% {background-position: -192px -320px;}
+  }
+  @include keyframes(army-#{$type}-walk-e){
+    0%, 24.99% {background-position: 0px -256px;}
+    25%, 49.99% {background-position: -64px -256px;}
+    50%, 74.99% {background-position: -128px -256px;}
+    75%, 100% {background-position: -192px -256px;}
+  }
+  @include keyframes(army-#{$type}-walk-ne){
+    0%, 24.99% {background-position: 0px -192px;}
+    25%, 49.99% {background-position: -64px -192px;}
+    50%, 74.99% {background-position: -128px -192px;}
+    75%, 100% {background-position: -192px -192px;}
+  }
+  @include keyframes(army-#{$type}-walk-w){
+    0%, 24.99% {background-position: 0px 0px;}
+    25%, 49.99% {background-position: -64px 0px;}
+    50%, 74.99% {background-position: -128px 0px;}
+    75%, 100% {background-position: -192px 0px;}
+  }
+  @include keyframes(army-#{$type}-walk-nw){
+    0%, 24.99% {background-position: 0px -64px;}
+    25%, 49.99% {background-position: -64px -64px;}
+    50%, 74.99% {background-position: -128px -64px;}
+    75%, 100% {background-position: -192px -64px;}
+  }
+  @include keyframes(army-#{$type}-walk-n){
+    0%, 24.99% {background-position: 0px -128px;}
+    25%, 49.99% {background-position: -64px -128px;}
+    50%, 74.99% {background-position: -128px -128px;}
+    75%, 100% {background-position: -192px -128px;}
+  }
+
+  .char.army-type-#{$type}.walk-n,
+  .up:active ~ .screen .char.army-type-#{$type}{
+    @include animation('army-#{$type}-walk-n 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-s,
+  .down:active ~ .screen .char.army-type-#{$type}{
+    @include animation('army-#{$type}-walk-s 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-w,
+  .left:active ~ .screen .char.army-type-#{$type}{
+    @include flipHorizontally();
+    @include animation('army-#{$type}-walk-e 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-e,
+  .right:active ~ .screen .char.army-type-#{$type}{
+    @include animation('army-#{$type}-walk-e 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-ne{
+    @include animation('army-#{$type}-walk-ne 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-nw{
+    @include flipHorizontally();
+    @include animation('army-#{$type}-walk-ne 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-se{
+    @include animation('army-#{$type}-walk-se 0.65s infinite');
+  }
+  .char.army-type-#{$type}.walk-sw{
+    @include flipHorizontally();
+    @include animation('army-#{$type}-walk-se 0.65s infinite');
+  }
+}
