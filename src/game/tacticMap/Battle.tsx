@@ -34,9 +34,7 @@ export const Battle = () => {
   const loadPlayers = async (): Promise<BattlePlayers[]> => {
     return [];
   }
-  const loadArmy = async (id: string): Promise<Army> => {
-    return await api.getArmy(id);
-  }
+  const loadArmy = async (id: string): Promise<Army> => await api.getArmy(id);
   const createTerrain = async (): Promise<WorldMap> => {
     const terrain = await api.getTerrainAt(0,0,0,0);
     return new WorldMap([[new Domain(0, 0, terrain)]], 22);
@@ -56,7 +54,7 @@ export const Battle = () => {
 }, []);
 
   return (
-    <Board>
+    <Board offset={30}>
       <Stats />
       {ready && <BattleMap world={battlefield} topArmy={attackers} bottomArmy={defenders} />}
       {!ready && <div>Loading...</div>}

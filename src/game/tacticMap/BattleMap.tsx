@@ -14,13 +14,14 @@ type BattleState = {
 }
 export class BattleMap extends React.Component<BattleProps, BattleState> {
   render() {
-    const {world, bottomArmy} = this.props;
-    return <>
+    const {world, bottomArmy, topArmy} = this.props;
+    return <div style={{position: 'relative'}}>
       <TerrainMap
         sz={20} tileSz={25} x={10} y={10}
         world={world}
       />
-      <Unit unit={bottomArmy.units[0]} z={100} color={false ? '#0f0' : '#f00'} />
-    </>;
+      {topArmy.units.map((unit, i) => <Unit key={i} z={100} color="red" unit={unit} />)}
+      {bottomArmy.units.map((unit, i) => <Unit key={i}  z={100} color="blue" unit={unit} />)}
+    </div>;
   }
 }

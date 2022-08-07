@@ -4,16 +4,15 @@
   left: 0;
   right: 0;
   bottom: 0;
-  margin: auto;
-  width: 94px;
-  height: 63px;
+  margin: 0;
+  width: 25px;
+  height: 25px;
 }
 .army-health {
   width: 33px;
   height: 15px;
   border-radius: 15px;
-  top: 16px;
-  left: 15px;
+  top: 10px;
   position: absolute;
 }
 $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, cyclops, centaur, minotaur, dragon, giant;
@@ -21,7 +20,8 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
 @each $type in $armyTypes {
   .char.army-type-#{$type} {
     position: absolute;
-    top: -22px;
+    top: -28px;
+    left: -14px;
     background-image: url("/images/res/#{$type}_army.png");
     // background-position: -480px 0px;
     background-size: 512px 512px;
@@ -31,19 +31,19 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     transition-timing-function: linear;
   }
 
-  @include keyframes(army-#{$type}-walk-sw){
+  @include keyframes(army-#{$type}-walk-nw){
     0%, 24.99% {background-position: 0px -448px;}
     25%, 49.99% {background-position: -64px -448px;}
     50%, 74.99% {background-position: -128px -448px;}
     75%, 100% {background-position: -192px -448px;}
   }
-  @include keyframes(army-#{$type}-walk-s){
+  @include keyframes(army-#{$type}-walk-n){
     0%, 24.99% {background-position: 0px -384px;}
     25%, 49.99% {background-position: -64px -384px;}
     50%, 74.99% {background-position: -128px -384px;}
     75%, 100% {background-position: -192px -384px;}
   }
-  @include keyframes(army-#{$type}-walk-se){
+  @include keyframes(army-#{$type}-walk-ne){
     0%, 24.99% {background-position: 0px -320px;}
     25%, 49.99% {background-position: -64px -320px;}
     50%, 74.99% {background-position: -128px -320px;}
@@ -55,7 +55,7 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     50%, 74.99% {background-position: -128px -256px;}
     75%, 100% {background-position: -192px -256px;}
   }
-  @include keyframes(army-#{$type}-walk-ne){
+  @include keyframes(army-#{$type}-walk-se){
     0%, 24.99% {background-position: 0px -192px;}
     25%, 49.99% {background-position: -64px -192px;}
     50%, 74.99% {background-position: -128px -192px;}
@@ -67,13 +67,13 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     50%, 74.99% {background-position: -128px 0px;}
     75%, 100% {background-position: -192px 0px;}
   }
-  @include keyframes(army-#{$type}-walk-nw){
+  @include keyframes(army-#{$type}-walk-sw){
     0%, 24.99% {background-position: 0px -64px;}
     25%, 49.99% {background-position: -64px -64px;}
     50%, 74.99% {background-position: -128px -64px;}
     75%, 100% {background-position: -192px -64px;}
   }
-  @include keyframes(army-#{$type}-walk-n){
+  @include keyframes(army-#{$type}-walk-s){
     0%, 24.99% {background-position: 0px -128px;}
     25%, 49.99% {background-position: -64px -128px;}
     50%, 74.99% {background-position: -128px -128px;}

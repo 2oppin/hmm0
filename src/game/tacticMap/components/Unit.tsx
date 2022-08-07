@@ -20,8 +20,9 @@ export class Unit extends React.Component<UnitProps> {
   }
   render() {
     const {z, unit, color} = this.props;
+    const [x, y] = unit.location;
     return (
-      <div className="army-container">
+      <div className="army-container" style={{left: x*25, top: 475 - y*25}}>
         <div
           className={`army-health`}
           style={{
