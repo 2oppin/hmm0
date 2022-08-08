@@ -22,7 +22,7 @@ class App extends Component {
         <div className="App">
             <Routes>
               <Route path="/" element={<Game world={world} creatures={creatures} />}/>
-              <Route path="/battle/:attaker/:defender" element={<Battle />} />
+              <Route path="/battle/:defender/:attaker" element={<Battle />} />
             </Routes>
         </div>
       </BrowserRouter>

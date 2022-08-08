@@ -5,6 +5,7 @@ type UnitProps = {
   z: number;
   color: string;
   unit: UnitModel;
+  active: boolean;
 }
 export class Unit extends React.Component<UnitProps> {
   calcArmyHealthCss(health: number, defender: boolean) {
@@ -19,10 +20,17 @@ export class Unit extends React.Component<UnitProps> {
     }
   }
   render() {
-    const {z, unit, color} = this.props;
+    const {z, unit, color, active} = this.props;
     const [x, y] = unit.location;
+    const capSzPos = (v: number) => ({
+      width: 25 + v*2,
+      height: 25 + v*2,
+      left: 0 - v,
+      top: 0 - v,
+    });
+    const dotZInx = (i: number) => (i%3 === 1 ? 10 : 1) * (3-(i/3|0));
     return (
-      <div className="army-container" style={{left: x*25, top: 475 - y*25}}>
+      <div className="army-container" style={{left: x*25, top: y*25}}>
         <div
           className={`army-health`}
           style={{
@@ -36,8 +44,24 @@ export class Unit extends React.Component<UnitProps> {
         </div>
         <div
           className={`char army-type-${unit.monster.type} walk-${unit.direction}`}
-          style={{zIndex: z}}
+          style={{zIndex: active ? z*20 + 1 : z}}
         ></div>
+        {active && <div
+          className="army-capabilities"
+          style={{zIndex: z*20}}
+        >
+          {[...Array(9)].map((_, i) => <div key={i} className="army-capabilities-dot" style={{zIndex: dotZInx(i)}}>
+            {unit.monster.capabilities.melee[i] > 0 && 
+              <div className="army-capabilities-dot-attack" style={{...capSzPos(unit.monster.capabilities.melee[i])}}></div>
+            }
+            {unit.monster.capabilities.defence[i] > 0 && 
+              <div className="army-capabilities-dot-defence" style={{...capSzPos(unit.monster.capabilities.defence[i])}}></div>
+            }
+            {unit.monster.capabilities.defence[i] < 0 && 
+              <div className="army-capabilities-dot-vulnerable" style={{...capSzPos(unit.monster.capabilities.defence[i])}}></div>
+            }
+          </div>)}
+        </div>}
       </div>
     );
   }

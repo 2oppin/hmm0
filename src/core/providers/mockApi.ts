@@ -1,6 +1,7 @@
 import * as React from "react";
 import {TerrainMap} from 'hmm0-types/terrainmap';
 import {Army, Unit} from 'hmm0-types/monster/army';
+import { Capabilities } from "hmm0-types/monster/monster";
 
 export class MockApi {
   async getTerrainAt(Dx: number, Dy: number, x: number, y: number): Promise<TerrainMap> {
@@ -19,7 +20,7 @@ export class MockApi {
         location: (isEnemy
           ? [cnt[id]++, 0]
           : [cnt[id]++, 19]) as [number, number],
-        monster: { type: 'ogre', power: 1, hp: 100, location: [NaN, NaN] },
+        monster: { type: 'ogre', power: 1, hp: 100, location: [NaN, NaN], capabilities: Capabilities.default },
       });
     })().next().value || null;
 

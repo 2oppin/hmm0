@@ -8,6 +8,74 @@
   width: 25px;
   height: 25px;
 }
+.army-capabilities {
+  width: 111px;
+  height: 111px;
+  box-sizing: border-box;
+  padding: 18px;
+  position: absolute;
+  left: -40px;
+  top: -48px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-radius: 100%;
+  background: #00000055;
+}
+.char.walk-ne+.army-capabilities {
+  transform: rotate(45deg);
+}
+.char.walk-e+.army-capabilities {
+  transform: rotate(90deg);
+}
+.char.walk-se+.army-capabilities {
+  transform: rotate(135deg);
+}
+.char.walk-s+.army-capabilities {
+  transform: rotate(180deg);
+}
+.char.walk-nw+.army-capabilities {
+  transform: rotate(-45deg);
+}
+.char.walk-w+.army-capabilities {
+  transform: rotate(-90deg);
+}
+.char.walk-sw+.army-capabilities {
+  transform: rotate(-135deg);
+}
+.army-capabilities-dot {
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  position: relative;
+}
+.army-capabilities-dot-attack {
+  width: 25px;
+  height: 25px;
+  left:0;
+  top:0;
+  border-radius: 100%;
+  background: #ff0000aa;
+  position: absolute;
+}
+.army-capabilities-dot-defence {
+  width: 25px;
+  height: 25px;
+  left:0;
+  top:0;
+  border-radius: 100%;
+  background: #0000ffaa;
+  position: absolute;
+}
+.army-capabilities-dot-vulnerable {
+  width: 25px;
+  height: 25px;
+  left:0;
+  top:0;
+  border-radius: 100%;
+  background: #000000aa;
+  position: absolute;
+}
 .army-health {
   width: 33px;
   height: 15px;
@@ -31,19 +99,19 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     transition-timing-function: linear;
   }
 
-  @include keyframes(army-#{$type}-walk-nw){
+  @include keyframes(army-#{$type}-walk-sw){
     0%, 24.99% {background-position: 0px -448px;}
     25%, 49.99% {background-position: -64px -448px;}
     50%, 74.99% {background-position: -128px -448px;}
     75%, 100% {background-position: -192px -448px;}
   }
-  @include keyframes(army-#{$type}-walk-n){
+  @include keyframes(army-#{$type}-walk-s){
     0%, 24.99% {background-position: 0px -384px;}
     25%, 49.99% {background-position: -64px -384px;}
     50%, 74.99% {background-position: -128px -384px;}
     75%, 100% {background-position: -192px -384px;}
   }
-  @include keyframes(army-#{$type}-walk-ne){
+  @include keyframes(army-#{$type}-walk-se){
     0%, 24.99% {background-position: 0px -320px;}
     25%, 49.99% {background-position: -64px -320px;}
     50%, 74.99% {background-position: -128px -320px;}
@@ -55,7 +123,7 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     50%, 74.99% {background-position: -128px -256px;}
     75%, 100% {background-position: -192px -256px;}
   }
-  @include keyframes(army-#{$type}-walk-se){
+  @include keyframes(army-#{$type}-walk-ne){
     0%, 24.99% {background-position: 0px -192px;}
     25%, 49.99% {background-position: -64px -192px;}
     50%, 74.99% {background-position: -128px -192px;}
@@ -67,13 +135,13 @@ $armyTypes: ogre, troll, goblin, kobold, orc, centaur, minotaur, dragon, giant, 
     50%, 74.99% {background-position: -128px 0px;}
     75%, 100% {background-position: -192px 0px;}
   }
-  @include keyframes(army-#{$type}-walk-sw){
+  @include keyframes(army-#{$type}-walk-nw){
     0%, 24.99% {background-position: 0px -64px;}
     25%, 49.99% {background-position: -64px -64px;}
     50%, 74.99% {background-position: -128px -64px;}
     75%, 100% {background-position: -192px -64px;}
   }
-  @include keyframes(army-#{$type}-walk-s){
+  @include keyframes(army-#{$type}-walk-n){
     0%, 24.99% {background-position: 0px -128px;}
     25%, 49.99% {background-position: -64px -128px;}
     50%, 74.99% {background-position: -128px -128px;}

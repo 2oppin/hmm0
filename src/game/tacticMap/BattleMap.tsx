@@ -20,8 +20,8 @@ export class BattleMap extends React.Component<BattleProps, BattleState> {
         sz={20} tileSz={25} x={10} y={10}
         world={world}
       />
-      {topArmy.units.map((unit, i) => <Unit key={i} z={100} color="red" unit={unit} />)}
-      {bottomArmy.units.map((unit, i) => <Unit key={i}  z={100} color="blue" unit={unit} />)}
+      {topArmy.units.map((unit, i) => <Unit key={i} active={false} z={100} color="red" unit={unit} />)}
+      {bottomArmy.units.map((unit, i) => <Unit key={i}  active={i == 1} z={100} color="blue" unit={unit} />)}
     </div>;
   }
 }
