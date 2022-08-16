@@ -1,17 +1,17 @@
 import { Direction } from "../../models/terrainmap";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 
-export type BattleActions =  {
-  onChangeActive: () => void,
-  onShowCapabilities: () => void,
-  onHideCapabilities: () => void,
-  onDirectionChange: (direction: Direction) => void,
-  onDirectionChangeReady: (direction: Direction) => void,
+export type BattleMapActions =  {
+  onChangeActive?: () => void,
+  onShowCapabilities?: () => void,
+  onHideCapabilities?: () => void,
+  onDirectionChange?: (direction: Direction) => void,
+  onDirectionChangeReady?: (direction: Direction) => void,
 }
 
-export const loadBattleKeyboard = (
+export const loadBattleMapKeyboard = (
   kbdh: KeyboardHandler,
-  actions: BattleActions,
+  actions: BattleMapActions,
 ): void => {
   const KeyToDirection: {[key: string]: Direction} = {
     "ArrowUp": 'n',

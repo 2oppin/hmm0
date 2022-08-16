@@ -1,4 +1,5 @@
-import { Hero } from "../../models/actors/hero";
+import { Hero } from "hmm0-types/hero";
+
 import { Direction } from "../../models/terrainmap";
 import { Monster } from "../../models/actors/monster";
 import { Creatures } from "../../models/creatures";

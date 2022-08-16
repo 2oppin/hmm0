@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Component, KeyboardEvent} from "react";
+import {Component} from "react";
 import { Hero as HeroModel, HeroType } from "../../models/actors/hero";
 import { Creatures } from "../components/Creatures";
 import { Hero } from "../components/Hero";
@@ -11,7 +11,6 @@ import { alertDlg, Dialog, textDlg } from "../../components/dialog";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { GameProps, GameState, MAP_SZ, TILE_SZ } from "./GameTypes";
 import { loadGameKeyboard } from "./GameKeyboard";
-import { WorldMap } from "../../models/worldmap";
 import { Domain } from "../../models/domain";
 import { Monster } from "../../models/actors/monster";
 import { Board } from "../components/Board";
