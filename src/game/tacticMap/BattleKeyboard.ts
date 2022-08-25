@@ -6,7 +6,9 @@ export type BattleActions =  {
   onShowCapabilities: () => void,
   onHideCapabilities: () => void,
   onDirectionChange: (direction: Direction) => void,
-  onDirectionChangeReady: (direction: Direction) => void,
+  onMoveForward: () => void,
+  onMeleeHit: () => void,
+  onCompleteTurn: () => void,
 }
 
 export const loadBattleKeyboard = (
@@ -25,10 +27,6 @@ export const loadBattleKeyboard = (
   };
 
   Object.entries(KeyToDirection).forEach(([key, dir]) => {
-    kbdh.listenToDown(key, (e) => {
-      console.log(`keydown: ${key}`);
-      actions.onDirectionChangeReady(dir);
-    });
     kbdh.listenToUp(key, (e) => {
       console.log(`keyup: ${key}`);
       actions.onDirectionChange(dir);
@@ -50,5 +48,13 @@ export const loadBattleKeyboard = (
   kbdh.listenToUp("Shift", (e) => {
     console.log(`keydown: Shift`, e);
     actions.onHideCapabilities();
+  });
+  kbdh.listenToUp(" ", (e) => {
+    console.log(`keydown: Space`, e);
+    actions.onMoveForward();
+  });
+  kbdh.listenToUp("Enter", (e) => {
+    console.log(`keydown: Enter`, e);
+    actions.onCompleteTurn();
   });
 }

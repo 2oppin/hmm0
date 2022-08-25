@@ -37,20 +37,23 @@ export class Unit extends React.Component<UnitProps> {
         <div
           className={`army-health`}
           style={{
-            zIndex: z-1,
+            zIndex: z + unit.location[1]-1,
             opacity: 0.65,
-            backgroundImage: this.calcArmyHealthCss(unit.health, true),
+            backgroundImage: this.calcArmyHealthCss(unit.health/unit.monster.hp, true),
             backgroundColor: color,
             transform: 'rotate(180deg)'
           }}>
         </div>
         <div
           className={`char army-type-${unit.monster.type} walk-${unit.direction}`}
-          style={{zIndex: active ? z*20 + 1 : z}}
+          style={{
+            zIndex: active ? z*20  + unit.location[1]+ 1 : z  + unit.location[1],
+            animationDelay: `${(1000 * (- Math.random()))|0}ms`
+          }}
         ></div>
         {showCapabilities && active && <div
           className="army-capabilities"
-          style={{zIndex: z*20}}
+          style={{zIndex: z*20 + unit.location[1]}}
         >
           {[...Array(9)].map((_, i) => <div key={i} className="army-capabilities-dot" style={{zIndex: dotZInx(i)}}>
             {unit.monster.capabilities.melee[i] > 0 && 

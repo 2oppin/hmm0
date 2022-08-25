@@ -28,6 +28,6 @@ export class Domain {
   }
 
   isTresspassable(x: number, y: number): boolean {
-    return this.map.get(x, y) === 1;
+    return this.map.isTresspassable([x, y]);
   }
 }
