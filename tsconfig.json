@@ -19,6 +19,6 @@
       ],
     },
   },
-  "exclude": ["dist", "hmm0-srv"],
-  "include": ["hmm0-srv/src/models/*", "./src/*"]
+  "exclude": ["dist"],
+  "include": ["hmm0-srv/src/models/*.ts*", "hmm0-srv/src/models/**/*.ts*", "./src/**/*.ts*"]
 }
