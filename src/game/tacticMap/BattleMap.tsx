@@ -1,9 +1,8 @@
 import * as React from "react";
 
-import { Army } from "hmm0-types/monster/army";
-import { Direction } from "hmm0-types/terrainmap";
+import { ArmyDetails } from "hmm0-types/monster/army";
 
-import { WorldMap } from "../../models/worldmap";
+import { WorldMap } from "hmm0-types/worldmap";
 import { TerrainMap } from "../components/Map";
 
 import { Unit } from "./components/Unit";
@@ -11,8 +10,8 @@ import { Unit } from "./components/Unit";
 
 type BattleMapProps = {
   world: WorldMap;
-  enemyArmy: Army;
-  playerArmy: Army;
+  enemyArmy: ArmyDetails;
+  playerArmy: ArmyDetails;
   enemyTurn: boolean;
   sz?: number;
   activeUnitInx?: number;

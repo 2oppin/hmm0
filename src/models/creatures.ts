@@ -1,7 +1,8 @@
 import { Monster } from "./actors/monster";
-import { Domain } from "./domain";
+import { Domain } from "hmm0-types/domain";
+import { WorldMap } from "hmm0-types/worldmap";
+
 import { singnedCoordsToUnsigned } from "./utils";
-import { WorldMap } from "./worldmap";
 
 export class Creatures {
   private creatures: // Domain[x][y][Monsters[]]

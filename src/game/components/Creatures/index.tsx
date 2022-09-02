@@ -1,15 +1,15 @@
 import * as React from "react";
-import { Monster } from "../../../models/actors/monster";
+import { Army } from "hmm0-types/monster/army";
 
 type CreaturesProps = {
-  creatures: Monster[];
+  creatures: Army[];
   x: number;
   y: number;
   sz: number;
   tileSz: number;
 }
 type CreaturesState = {
-  visibleCreatures: Monster[];
+  visibleCreatures: Army[];
 }
 export class Creatures extends React.Component<CreaturesProps, CreaturesState> {
   constructor(props: CreaturesProps) {
@@ -23,19 +23,20 @@ export class Creatures extends React.Component<CreaturesProps, CreaturesState> {
     if (prevProps.x !== x || prevProps.y !== y)
       this.setState({visibleCreatures: this.filterCreatures(creatures)});
   }
-  private filterCreatures(creatures: Monster[]) {
+  private filterCreatures(creatures: Army[]) {
     const {x, y, sz} = this.props;
     const btw = (p: number) => (a: number) => Math.abs(a - p) < sz / 2;
     const visibleCreatures = creatures.filter(({location: [cx, cy]}) => btw(cx)(x) && btw(cy)(y));
     return visibleCreatures;
   }
-  getPosition(c: Monster) {
+  getPosition(c: Army) {
     const {tileSz, sz, x, y} = this.props;
     const [cx, cy] = c.location;
     return [(sz/2 - x + cx) * tileSz, (sz/2 - y + cy) * tileSz, (sz/2 - y + cy)];
   }
   render() {
     const {visibleCreatures} = this.state;
+
     return <div className="creature-container">
       {visibleCreatures.map((c, i) => {
         const [left, top, zIndex] = this.getPosition(c);

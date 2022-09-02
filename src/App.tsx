@@ -1,44 +1,54 @@
 import * as React from 'react';
-import {Component} from 'react';
+import { useContext, useEffect, useState} from 'react';
 import './App.scss';
 
-import {Game} from './game/strategicMap/Game';
-import {BrowserRouter, Route, Routes, useParams} from 'react-router-dom';
+import { Game } from './game/strategicMap/Game';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import {StoreContext} from './core/Store';
-import { WorldMap } from './models/worldmap';
-import { Creatures } from './models/creatures';
+import { StoreContext } from './core/Store';
 import { Battle } from './game/tacticMap/Battle';
 import { ApiContext, MockApi } from './core/providers/mockApi';
 
+import { WorldMap } from "hmm0-types/worldmap"
+import { User } from 'hmm0-types/user/user';
 
-const world: WorldMap = new WorldMap();
-const creatures: Creatures = new Creatures(world);
-creatures.seed(world.getDomain(0, 0), 100, {[world.domainSize/2|0]: world.domainSize/2|0});
-class App extends Component {
-  render() {
-    return (
-      <BrowserRouter>
-        <div className="App">
-            <Routes>
-              <Route path="/" element={<Game world={world} creatures={creatures} />}/>
-              <Route path="/battle/:battleId" element={<Battle />} />
-            </Routes>
-        </div>
-      </BrowserRouter>
-    );
-  }
+
+const App = () => {
+  const api = useContext(ApiContext);
+  const [ready, setReady] = useState(false);
+  const [world, setWorld] = useState<WorldMap>(null);
+  const [user, setUser] = useState<User>(null);
+
+  useEffect(() => {
+    api.getWorldMap().then(async (w) => {
+      setWorld(w);
+      setUser(await api.getUserInfo());
+      setReady(true);
+    });
+  }, []);
+
+  return (
+    <BrowserRouter>
+      {ready && <div className="App">
+        <StoreContext.Provider value={{world, user}}>
+          <Routes>
+            <Route path="/" element={<Game />}/>
+            <Route path="/battle/:battleId" element={<Battle />} />
+          </Routes>
+        </StoreContext.Provider>
+      </div>}
+    </BrowserRouter>
+  );
 }
 
 const appWithStore = () => {
   class WithStore extends React.Component {
     render() {
       return (
-        <StoreContext.Provider value={{store: {world}}}>
           <ApiContext.Provider value={new MockApi}>
             <App />
           </ApiContext.Provider>
-        </StoreContext.Provider>
+        
       );
     }
   }

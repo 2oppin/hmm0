@@ -1,29 +1,20 @@
 import { Hero } from "../../models/actors/hero";
-import { Direction } from "../../models/terrainmap";
-import { Monster } from "../../models/actors/monster";
-import { Creatures } from "../../models/creatures";
-import { WorldMap } from "../../models/worldmap";
+import { Direction } from "hmm0-types/terrainmap";
+import { ArmyDetails } from "hmm0-types/monster/army";
 
 export const MAP_SZ = 12*2;
 export const TILE_SZ = 25;
 
-export type GameProps = {
-  world: WorldMap;
-  creatures: Creatures;
-}
+export type StrategicAction = {
+  type: 'kbd' | 'upd' | 'move' | 'turn',
+  d?: Direction,
+  partial?: Partial<GameState>,
+};
+
 export type GameState = {
   x: number;
   y: number;
   dx: number;
   dy: number;
-  heroDirection: Direction;
   hero: Hero;
-
-  // event State
-  enemy: Monster | null;
-  localCreatures: Monster[];
-
-  // dialog
-  dialogContents: React.ReactElement | null;
-  dialogClosable: boolean;
 }

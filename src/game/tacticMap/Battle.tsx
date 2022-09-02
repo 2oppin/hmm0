@@ -3,21 +3,22 @@ import { useParams } from "react-router-dom";
 import { ApiContext } from "../../core/providers/mockApi";
 import { Hero } from "../../models/actors/hero";
 import { Monster } from "../../models/actors/monster";
-import { Domain } from "../../models/domain";
 import { Player } from "../../models/player";
-import { WorldMap } from "../../models/worldmap";
+import { WorldMap } from "hmm0-types/worldmap";
 
 import { Board } from "../components/Board";
 import { Stats } from "./components/stats/BattleStats";
 import { UnitStats } from "./components/stats/UnitStats";
 import { useContext, useEffect, useReducer, useState } from "react";
 import { BattleMap } from "./BattleMap";
-import { Army, Unit } from "hmm0-types/monster/army";
-import { addDirection, Direction } from "hmm0-types/terrainmap";
+import { ArmyDetails } from "hmm0-types/monster/army";
+import { addDirection, TerrainMap } from "hmm0-types/terrainmap";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { loadBattleKeyboard } from "./BattleKeyboard";
-import { Battle as BattleModel, BattleEvent, BattleLog, Hit, Turn } from "hmm0-types/battle/battle";
+import { Battle as BattleModel, BattleEvent, Hit } from "hmm0-types/battle/battle";
 import { calculateDamage } from "hmm0-types/battle/attack";
+
+import { StoreContext } from "../../core/Store";
 
 type BattlePlayers = {
   player: Player;
@@ -41,12 +42,14 @@ export const Battle = () => {
 
   const {battleId} = useParams();
   const api = useContext(ApiContext);
+  const {world} = useContext(StoreContext);
+
   const [players, setPlayers] = useState<BattlePlayers[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   const [battle, setBattle] = useState<BattleModel>();
-  const [battlefield, setBattlefield] = useState<WorldMap>();
-  const [attackers, setAttackers] = useState<Army>();
-  const [defenders, setDefenders] = useState<Army>();
+  const [battlefield, setBattlefield] = useState<TerrainMap>();
+  const [attackers, setAttackers] = useState<ArmyDetails>();
+  const [defenders, setDefenders] = useState<ArmyDetails>();
 
   const kbHandler: KeyboardHandler = new KeyboardHandler();
   const keyboardActions = (state: BattleState, action: BattleAction): BattleState => {
@@ -91,7 +94,7 @@ export const Battle = () => {
                 unit.location
               );
               newLocation = newLocation.map(v => Math.max(0, Math.min(battleMapSz, v))) as [number, number];
-              const isTresspassable = battlefield.isTresspassable(...newLocation);
+              const isTresspassable = battlefield.isTresspassable(newLocation);
               const isNonOccupied = !units.some((u) => u.location[0] == newLocation[0] && u.location[1] == newLocation[1]);
               const enemyInx = enemies.findIndex((u) => u.location[0] == newLocation[0] && u.location[1] == newLocation[1]);
               if (enemyInx >= 0 && !enemyTurn) {
@@ -145,10 +148,9 @@ export const Battle = () => {
     return [];
   }
   const loadBattle = async (): Promise<BattleModel> => await api.getBattle(battleId);
-  const loadArmy = async (id: string): Promise<Army> => await api.getArmy(id);
-  const createTerrain = async (): Promise<WorldMap> => {
-    const terrain = await api.getTerrainAt(0,0,0,0);
-    return new WorldMap([[new Domain(0, 0, terrain)]], 22);
+  const loadArmy = async (id: string): Promise<ArmyDetails> => await api.getArmyDetails(id);
+  const loadTerrain = async (battle: BattleModel): Promise<TerrainMap> => {
+    return api.getTerrainAt(battle.location);
   }
   useEffect(() => {
     loadBattleKeyboard(kbHandler, {
@@ -184,10 +186,10 @@ export const Battle = () => {
     loadBattle().then(battle =>
       Promise.all([
         loadPlayers(),
-        createTerrain(),
+        loadTerrain(battle),
         loadArmy(battle.attackerId),
         loadArmy(battle.defenderId),
-      ]).then(([players, battlefield, attakingArmy, defendingArmy]) => {
+      ]).then(async ([players, battlefield, attakingArmy, defendingArmy]) => {
         console.log(battle);
         setBattle(battle);
         setPlayers(players);
@@ -207,7 +209,7 @@ export const Battle = () => {
     <Board offset={30}>
       <Stats />
       {ready && <BattleMap
-        world={battlefield}
+        world={world}
         sz={battleMapSz}
         enemyArmy={defenders}
         playerArmy={attackers}

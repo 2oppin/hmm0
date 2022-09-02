@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { WorldMap } from '../../../models/worldmap';
+import { WorldMap } from 'hmm0-types/worldmap';
 
 type MapProps = {
   sz: number;
