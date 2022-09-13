@@ -2,7 +2,7 @@ import * as React from "react";
 import { addDirection, Direction, TerrainMap } from 'hmm0-types/terrainmap';
 import { Army, ArmyDetails, Unit } from 'hmm0-types/monster/army';
 import { Battle, BattleEvent, BattleLog } from 'hmm0-types/battle/battle';
-import { nextAIAction } from 'hmm0-types/battle/ai';
+import { nextAIActions } from 'hmm0-types/battle/ai';
 import { WorldMap } from 'hmm0-types/worldmap';
 import { defaultCapabilities, MonsterType } from "hmm0-types/monster/monster";
 import { Domain } from "hmm0-types/domain";
@@ -107,7 +107,7 @@ export class MockApi {
         for (let j = 0; j < this.world.domainSize; j++) {
           const id = genUUID();
           const p = (cntPerDomain - created) / (this.world.domainSize ** 2);
-          if (!this.world.isTresspassable(i, j) || Math.random() > p) continue;
+          if (!this.world.isTresspassable([i, j]) || Math.random() > p) continue;
 
           this.armies[id] = {
               id,
@@ -139,7 +139,7 @@ export class MockApi {
         location: (isEnemy
           ? [cnt[id]++ + 2, 19]
           : [cnt[id]++, 20]) as [number, number],
-        monster: { type: 'ogre', power: 1, ap: 3, hp: 15, location: [NaN, NaN], capabilities: defaultCapabilities() },
+        monster: { type: 'ogre', power: 1, ap: 3, hp: 15, capabilities: defaultCapabilities() },
       });
     })().next().value || null;
 
@@ -169,22 +169,34 @@ export class MockApi {
       this.stopAI();
       this.battles[battleId].winner = actions.playerId;
     } else
-      this.makeUpAnAI(attackerId, defenderId);
+      this.makeUpAnAI(battleId, defenderId);
   }
 
   private async playBattleLog(actions: BattleLog): Promise<boolean> {
+    const isTresspassabe = ([x, y]: [number, number], map: TerrainMap, armies: ArmyDetails[]): boolean => {
+      if (!map.isTresspassable([x, y])) return false;
+      return !armies.some(({units}) => units.some(({location}) => location[0] === x && location[1] === y));
+    };
+
     for(const action of actions.events) {
       console.log(`PlaY: `, action, actions);
       if (action.type === 'end') break;
       switch (action.type) {
         case 'move':
-          this.armies[actions.playerId].units[action.unitInx].location = addDirection(this.armies[actions.playerId].units[action.unitInx].direction, this.armies[actions.playerId].units[action.unitInx].location);
+          const newLocation = addDirection(this.armies[actions.playerId].units[action.unitInx].direction, this.armies[actions.playerId].units[action.unitInx].location);
+          if (isTresspassabe(newLocation, this.battleGround, Object.values(this.armies)))
+            this.armies[actions.playerId].units[action.unitInx].location = newLocation;
+          else {
+            console.log(`Played well, path is open on: [${newLocation[0]}, ${newLocation[1]}]`);
+          }
           continue;
         case 'turn':
           this.armies[actions.playerId].units[action.unitInx].direction = action.direction;
           continue;
         case 'hit':
+          console.log(`Army[${action.defenderUnitInx}], prepare yourself! Now at ${this.armies[action.defenderId].units[action.defenderUnitInx].health}`);
           this.armies[action.defenderId].units[action.defenderUnitInx].health -= action.damage;
+          console.log(`Army[${action.defenderUnitInx}] sustained damage ~ ${action.damage} and now at ${this.armies[action.defenderId].units[action.defenderUnitInx].health}`);
           if (this.armies[action.defenderId].units[action.defenderUnitInx].health <= 0) {
             console.log(`#${action.defenderId} = ${action.defenderUnitInx} HP ~ ${this.armies[action.defenderId].units[action.defenderUnitInx].health}`)
             this.armies[action.defenderId].units.splice(action.defenderUnitInx, 1);
@@ -204,18 +216,20 @@ export class MockApi {
     this.aiInterval = null;
   }
 
-  private async makeUpAnAI(playerId: string, aiId: string): Promise<void> {
+  private async makeUpAnAI(battleId: string, aiId: string): Promise<void> {
     let inx = 0;
+    const events = nextAIActions({
+      armies: this.armies,
+      aiId,
+      map: this.battleGround,
+    }, inx);
+    console.log("AI EVENTS:", events, this.armies[aiId].units);
     this.aiInterval = setInterval(async () => {
-      const event = nextAIAction({
-        armies: this.armies,
-        aiId: '2',
-        map: this.battleGround,
-      }, inx);
-      if (this.armies[aiId].units[inx]?.ap === 0) inx++;
+      const event = events.shift();
+      if (!events.length) inx++;
       console.log("nextAction", event);
       this.notify(event);
-      this.playBattleLog({battleId: '1', playerId: '2', events: [event]});
+      this.playBattleLog({battleId, playerId: aiId, events: [event]});
       if (event.type === 'end') {
         this.stopAI();
       }

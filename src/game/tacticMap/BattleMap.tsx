@@ -2,14 +2,14 @@ import * as React from "react";
 
 import { ArmyDetails } from "hmm0-types/monster/army";
 
-import { WorldMap } from "hmm0-types/worldmap";
+import { TerrainMap as TerrainMapModel } from "hmm0-types/terrainmap";
 import { TerrainMap } from "../components/Map";
 
 import { Unit } from "./components/Unit";
 
 
 type BattleMapProps = {
-  world: WorldMap;
+  map: TerrainMapModel;
   enemyArmy: ArmyDetails;
   playerArmy: ArmyDetails;
   enemyTurn: boolean;
@@ -20,7 +20,7 @@ type BattleMapProps = {
 }
 
 export const BattleMap = ({
-  world,
+  map,
   playerArmy,
   enemyArmy,
   enemyTurn,
@@ -32,7 +32,7 @@ export const BattleMap = ({
   return <div style={{position: 'relative'}}>
     <TerrainMap
       sz={sz} tileSz={25} x={10} y={10}
-      world={world}
+      map={map}
     />
     {enemyArmy.units.map((unit, i) =>
       <Unit

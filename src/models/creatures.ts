@@ -72,7 +72,7 @@ export class Creatures {
     for (let x = 0, i=0; x < this.world.domainSize && count; x++)
     for (let y = 0; y < this.world.domainSize && count; y++, i++) {
       if (skipCoords[x] === y) continue;
-      if (!d.isTresspassable(x, y)) continue;
+      if (!d.isTresspassable([x, y])) continue;
 
       let pM = count / (d.dencity * (this.world.domainSize**2 - i));
       if (Math.random() < pM) {

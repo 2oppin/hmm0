@@ -7,7 +7,7 @@ import { Hero } from "../components/Hero";
 
 import {TerrainMap} from '../components/Map'
 import { Stats } from "../components/stats";
-import { alertDlg, Dialog, textDlg } from "../../components/dialog";
+import { Dialog, textDlg } from "../../components/dialog";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { GameState, MAP_SZ, StrategicAction, TILE_SZ } from "./GameTypes";
 import { loadGameKeyboard } from "./GameKeyboard";
@@ -89,7 +89,7 @@ export const Game = () => {
 
       let [nx, ny] = addDirection(action.d, [x, y]);
 
-      if (!world.isTresspassable(nx, ny))
+      if (!world.isTresspassable([nx, ny]))
         return s;
 
       const enemyArmy = localArmies.find(({location: [ax, ay]}) => ax === nx && ay === ny);
@@ -142,7 +142,7 @@ console.log('S', state);
           margin: 'auto',
         }}
       >
-      <TerrainMap sz={MAP_SZ} tileSz={TILE_SZ} world={world} x={x} y={y} />
+      <TerrainMap sz={MAP_SZ} tileSz={TILE_SZ} map={world} x={x} y={y} />
       <Hero hero={hero} z={MAP_SZ/2}/>
       {localArmies.length && <Creatures x={x} y={y} sz={MAP_SZ} tileSz={TILE_SZ} creatures={localArmies}/>}
       <Dialog

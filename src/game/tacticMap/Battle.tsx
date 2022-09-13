@@ -4,7 +4,6 @@ import { ApiContext } from "../../core/providers/mockApi";
 import { Hero } from "../../models/actors/hero";
 import { Monster } from "../../models/actors/monster";
 import { Player } from "../../models/player";
-import { WorldMap } from "hmm0-types/worldmap";
 
 import { Board } from "../components/Board";
 import { Stats } from "./components/stats/BattleStats";
@@ -78,6 +77,10 @@ export const Battle = () => {
           action.event.unitInx = activeUnit;
         }
 
+        // Validate actions; ignore incomplete
+        if (action.event.type !== 'end' && action.event?.unitInx < 0)
+          return state;
+
         // Do not duplicate "end" event; for a several ENTER hits for instance
         if (action.event.type !== 'end' || actionsMade[actionsMade.length-1]?.type !== 'end')
           actionsMade.push(action.event);
@@ -150,8 +153,11 @@ export const Battle = () => {
   const loadBattle = async (): Promise<BattleModel> => await api.getBattle(battleId);
   const loadArmy = async (id: string): Promise<ArmyDetails> => await api.getArmyDetails(id);
   const loadTerrain = async (battle: BattleModel): Promise<TerrainMap> => {
-    return api.getTerrainAt(battle.location);
+    const t = api.getTerrainAt(battle.location);
+    console.log(await t);
+    return t;
   }
+
   useEffect(() => {
     loadBattleKeyboard(kbHandler, {
       onChangeActive: () => !enemyTurn && dispatch({type: 'changeActive'}),
@@ -209,7 +215,7 @@ export const Battle = () => {
     <Board offset={30}>
       <Stats />
       {ready && <BattleMap
-        world={world}
+        map={battlefield}
         sz={battleMapSz}
         enemyArmy={defenders}
         playerArmy={attackers}

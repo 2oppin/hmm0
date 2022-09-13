@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { WorldMap } from 'hmm0-types/worldmap';
+import { AbstractMap } from 'hmm0-types/map';
 
 type MapProps = {
   sz: number;
   tileSz: number;
-  world: WorldMap;
+  map: AbstractMap;
   x: number;
   y: number;
 }
@@ -38,14 +38,14 @@ export class TerrainMap extends React.Component<MapProps, MapState> {
 
   componentDidUpdate(): void {
     if (this.state.tilesPreloaded) {
-      const {tileSz, world, sz, x, y} = this.props;
+      const {tileSz, map, sz, x, y} = this.props;
       const canvas = document.getElementById('bboard-canvas') as HTMLCanvasElement;
       const ctx = canvas.getContext('2d');
 
       for (let i = 0; i < sz**2; i++) {
         const [cx, cy] = [x + i%sz - sz/2, y + (i/sz|0) - sz/2];
         const tile = [[0, 1], [0, 0], [1, 0], [1, 1]].reduce((a, [dx, dy], i) => 
-          a + ((+world.isTresspassable(cx + dx, cy + dy)) << i), 0
+          a + ((+map.isTresspassable([cx + dx, cy + dy])) << i), 0
         );
         ctx.drawImage(TerrainMap.imageBank[tile], (i%sz) * tileSz, (i/sz|0) * tileSz, tileSz, tileSz);
       }
