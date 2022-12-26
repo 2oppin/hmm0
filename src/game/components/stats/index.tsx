@@ -9,17 +9,18 @@ type StatsProps = {
   world: WorldMap;
   creatures: Army[];
   hero: Hero;
+  collapsed: boolean;
 }
 
 export const Stats = (props: StatsProps) => {
 
   console.log('stats::: ', props);
 
-  const {world, creatures, hero} = props;
+  const {world, creatures, hero, collapsed} = props;
   const [x,y] = hero?.location || [];
   const [Dx, Dy, dx, dy] = world.convertCoord(x, y);
   return (
-    <div>
+    <div className={`game-stats${collapsed ? ' collapsed' : ''}`}>
       {hero && <>
         Hero Power: {hero.power}<br />
         Location: <b>{x} : {y}</b><br />

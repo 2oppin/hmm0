@@ -1,13 +1,23 @@
 import * as React from "react";
 import { addDirection, Direction, TerrainMap } from 'hmm0-types/terrainmap';
 import { Army, ArmyDetails, Unit } from 'hmm0-types/monster/army';
-import { Battle, BattleEvent, BattleLog } from 'hmm0-types/battle/battle';
+import { Battle, BattleEvent, BattleLog, BattleResult } from 'hmm0-types/battle/battle';
 import { nextAIActions } from 'hmm0-types/battle/ai';
 import { WorldMap } from 'hmm0-types/worldmap';
 import { defaultCapabilities, MonsterType } from "hmm0-types/monster/monster";
 import { Domain } from "hmm0-types/domain";
 import { User } from "hmm0-types/user/user";
 import { genUUID } from "hmm0-types/untils";
+
+// Helpers
+const unit = () => ({
+  count: 1,
+  ap: 3,
+  health: 15,
+  direction: 'n',
+  location: [0, 0],
+  monster: { type: 'ogre' as MonsterType, power: 1, ap: 3, hp: 2, location: [NaN, NaN], capabilities: defaultCapabilities() },
+}) as Unit;
 
 export class MockApi {
   private aiInterval: any = null;
@@ -93,14 +103,6 @@ export class MockApi {
   // --- Armies -----
   async getArmiesForDomain(wid: string, Dx: number, Dy: number): Promise<Army[]> {
     if (!this.neutralGeneratedForDomain[`${Dx}_${Dy}`]) {
-      const unit = () => ({
-        count: 1,
-        ap: 3,
-        health: 15,
-        direction: 'n',
-        location: [0, 0],
-        monster: { type: 'ogre' as MonsterType, power: 1, ap: 3, hp: 15, location: [NaN, NaN], capabilities: defaultCapabilities() },
-      }) as Unit;
       let cntPerDomain = this.world.domainSize;
       let created = 0;
       for (let i = 0; i < this.world.domainSize; i++) 
@@ -113,8 +115,8 @@ export class MockApi {
               id,
               type: 'nature',
               heroId: null,
-              location: [i, j],
-              units: [unit()],//, unit(), unit(), unit(), unit()],
+              location: [Dx*this.world.domainSize + i, Dy*this.world.domainSize + j],
+              units: [...Array(Math.random()*5|0)].map(_ => unit()),
           };
           created++;
         }
@@ -143,7 +145,7 @@ export class MockApi {
       });
     })().next().value || null;
 
-    this.armies[id] = {
+    this.armies[id] = this.armies[id] || {
       id,
       type: 'nature',
       heroId: id,
@@ -159,20 +161,28 @@ export class MockApi {
     return JSON.parse(JSON.stringify(obj));
   }
 
-  async pushArmyActions(battleId: string, actions: BattleLog): Promise<void> {
+  async pushArmyActions(battleId: string, actions: BattleLog): Promise<BattleResult> {
     this.aiInterval && clearInterval(this.aiInterval);
     const { attackerId, defenderId } = this.battles[battleId];
     this.battles[battleId].turns.push(actions);
-    const isEnded = await this.playBattleLog(actions);
+    const result = await this.playBattleLog(actions);
     console.log("actions played", actions, this.armies);
-    if (isEnded) {
+    if (result.complete) {
       this.stopAI();
-      this.battles[battleId].winner = actions.playerId;
-    } else
+      this.battles[battleId].winner = result.winner;
+      const loser = [attackerId, defenderId].find(id => id !== result.winner)
+      
+      if (loser !== actions.playerId) {
+        console.log(`DELETE army ${loser}`);
+        delete this.armies[loser];
+      }
+    } else {
       this.makeUpAnAI(battleId, defenderId);
+    }
+    return result;
   }
 
-  private async playBattleLog(actions: BattleLog): Promise<boolean> {
+  private async playBattleLog(actions: BattleLog): Promise<BattleResult> {
     const isTresspassabe = ([x, y]: [number, number], map: TerrainMap, armies: ArmyDetails[]): boolean => {
       if (!map.isTresspassable([x, y])) return false;
       return !armies.some(({units}) => units.some(({location}) => location[0] === x && location[1] === y));
@@ -202,13 +212,20 @@ export class MockApi {
             this.armies[action.defenderId].units.splice(action.defenderUnitInx, 1);
             if (!this.armies[action.defenderId].units.length) {
               alert(`USER-${actions.playerId} WON!!!`);
-              return true;
+              return {
+                valid: true,
+                complete: true,
+                winner: actions.playerId,
+              };
             }
           }
           continue;
       }
     }
-    return false;
+    return {
+      valid: true,
+      complete: false,
+    };
   }
 
   private stopAI() {
@@ -229,7 +246,7 @@ export class MockApi {
       if (!events.length) inx++;
       console.log("nextAction", event);
       this.notify(event);
-      this.playBattleLog({battleId, playerId: aiId, events: [event]});
+      await this.playBattleLog({battleId, playerId: aiId, events: [event]});
       if (event.type === 'end') {
         this.stopAI();
       }

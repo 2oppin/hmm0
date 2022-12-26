@@ -3,9 +3,7 @@ import { Army } from "hmm0-types/monster/army";
 
 type CreaturesProps = {
   creatures: Army[];
-  x: number;
-  y: number;
-  sz: number;
+  visibleBox?: [number, number, number, number];
   tileSz: number;
 }
 type CreaturesState = {
@@ -19,20 +17,21 @@ export class Creatures extends React.Component<CreaturesProps, CreaturesState> {
     };
   }
   componentDidUpdate(prevProps: Readonly<CreaturesProps>, prevState: Readonly<CreaturesState>, snapshot?: any): void {
-    const {creatures, x, y, sz} = this.props;
-    if (prevProps.x !== x || prevProps.y !== y)
+    const {creatures, visibleBox: [x, y, w, h]} = this.props;
+    const {visibleBox: [x0, y0, w0, h0]} = prevProps;
+    if (x0 !== x || y0 !== y || w != w0 || h != h0)
       this.setState({visibleCreatures: this.filterCreatures(creatures)});
   }
   private filterCreatures(creatures: Army[]) {
-    const {x, y, sz} = this.props;
-    const btw = (p: number) => (a: number) => Math.abs(a - p) < sz / 2;
-    const visibleCreatures = creatures.filter(({location: [cx, cy]}) => btw(cx)(x) && btw(cy)(y));
+    const {visibleBox: [x, y, w, h]} = this.props;
+    const btw = (p: number, d: number) => (a: number) => Math.abs(a - p) < d / 2;
+    const visibleCreatures = creatures.filter(({location: [cx, cy]}) => btw(cx, w)(x) && btw(cy, h)(y));
     return visibleCreatures;
   }
   getPosition(c: Army) {
-    const {tileSz, sz, x, y} = this.props;
+    const {tileSz, visibleBox: [x, y, w, h]} = this.props;
     const [cx, cy] = c.location;
-    return [(sz/2 - x + cx) * tileSz, (sz/2 - y + cy) * tileSz, (sz/2 - y + cy)];
+    return [(w/2 - x + cx) * tileSz, (h/2 - y + cy) * tileSz, (h/2 - y + cy)];
   }
   render() {
     const {visibleCreatures} = this.state;

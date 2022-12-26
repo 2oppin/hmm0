@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ApiContext } from "../../core/providers/mockApi";
 import { Hero } from "../../models/actors/hero";
 import { Monster } from "../../models/actors/monster";
@@ -14,7 +14,7 @@ import { ArmyDetails } from "hmm0-types/monster/army";
 import { addDirection, TerrainMap } from "hmm0-types/terrainmap";
 import { KeyboardHandler } from "../contexts/KeyboardContext";
 import { loadBattleKeyboard } from "./BattleKeyboard";
-import { Battle as BattleModel, BattleEvent, Hit } from "hmm0-types/battle/battle";
+import { Battle as BattleModel, BattleEvent, BattleResult, Hit } from "hmm0-types/battle/battle";
 import { calculateDamage } from "hmm0-types/battle/attack";
 
 import { StoreContext } from "../../core/Store";
@@ -41,6 +41,7 @@ export const Battle = () => {
 
   const {battleId} = useParams();
   const api = useContext(ApiContext);
+  const navigate = useNavigate();
   const {world} = useContext(StoreContext);
 
   const [players, setPlayers] = useState<BattlePlayers[]>([]);
@@ -130,6 +131,15 @@ export const Battle = () => {
               battleId: "1",
               playerId: "1",
               events: actionsMade,
+            }).then((res: BattleResult) => {
+              if (res.complete) {
+                if (res.winner === "1") {
+                  alert("YOU WON!!!!");
+                } else {
+                  alert("YOU LOST :`(");
+                }
+                navigate('/');
+              }
             });
             actionsMade = [];
             return {enemyTurn: !enemyTurn, activeUnit: -1, showCapabilities: false};

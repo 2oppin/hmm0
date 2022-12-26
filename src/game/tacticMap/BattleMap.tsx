@@ -31,7 +31,7 @@ export const BattleMap = ({
 }: BattleMapProps) =>  {
   return <div style={{position: 'relative'}}>
     <TerrainMap
-      sz={sz} tileSz={25} x={10} y={10}
+      width={sz} height={sz} tileSz={25} x={10} y={10}
       map={map}
     />
     {enemyArmy.units.map((unit, i) =>
